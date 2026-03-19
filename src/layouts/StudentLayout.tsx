@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAppContext } from "@/contexts/AppContext";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard, FileText, User, Bell, LogOut, Menu, X, ClipboardList, FileDown
@@ -9,6 +10,7 @@ import collegeLogo from "@/assets/college-logo.png";
 
 const StudentLayout = () => {
   const { user, logout } = useAuth();
+  const { unreadCount } = useAppContext();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -18,13 +20,20 @@ const StudentLayout = () => {
   };
 
   const links = [
-    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/dashboard/apply", icon: FileText, label: "Apply" },
-    { to: "/dashboard/status", icon: ClipboardList, label: "Status" },
-    { to: "/dashboard/forms", icon: FileDown, label: "Forms" },
-    { to: "/dashboard/profile", icon: User, label: "Profile" },
-    { to: "/dashboard/notifications", icon: Bell, label: "Alerts" },
+    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", badge: 0 },
+    { to: "/dashboard/apply", icon: FileText, label: "Apply", badge: 0 },
+    { to: "/dashboard/status", icon: ClipboardList, label: "Status", badge: 0 },
+    { to: "/dashboard/forms", icon: FileDown, label: "Forms", badge: 0 },
+    { to: "/dashboard/profile", icon: User, label: "Profile", badge: 0 },
+    { to: "/dashboard/notifications", icon: Bell, label: "Alerts", badge: unreadCount },
   ];
+
+  const NavBadge = ({ count }: { count: number }) =>
+    count > 0 ? (
+      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+        {count > 9 ? "9+" : count}
+      </span>
+    ) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,6 +48,10 @@ const StudentLayout = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <NavLink to="/dashboard/notifications" className="relative p-2 text-muted-foreground hover:text-card-foreground sm:hidden">
+            <Bell size={20} />
+            <NavBadge count={unreadCount} />
+          </NavLink>
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="sm:hidden text-card-foreground p-2">
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -62,13 +75,18 @@ const StudentLayout = () => {
               end={link.to === "/dashboard"}
               onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
+                `relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                   isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-card-foreground"
                 }`
               }
             >
               <link.icon size={16} />
               {link.label}
+              {link.badge > 0 && (
+                <span className="bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
+                  {link.badge}
+                </span>
+              )}
             </NavLink>
           ))}
         </motion.nav>
@@ -83,12 +101,15 @@ const StudentLayout = () => {
               to={link.to}
               end={link.to === "/dashboard"}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+                `relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                   isActive ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-card-foreground hover:bg-secondary"
                 }`
               }
             >
-              <link.icon size={18} />
+              <div className="relative">
+                <link.icon size={18} />
+                <NavBadge count={link.badge} />
+              </div>
               {link.label}
             </NavLink>
           ))}
@@ -108,12 +129,15 @@ const StudentLayout = () => {
             to={link.to}
             end={link.to === "/dashboard"}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 text-xs transition-all ${
+              `relative flex flex-col items-center gap-0.5 text-xs transition-all ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`
             }
           >
-            <link.icon size={20} />
+            <div className="relative">
+              <link.icon size={20} />
+              <NavBadge count={link.badge} />
+            </div>
             {link.label}
           </NavLink>
         ))}
