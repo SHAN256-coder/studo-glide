@@ -23,7 +23,7 @@ const LoginPage = () => {
       toast.success("Login successful!");
       navigate(role === "admin" ? "/admin" : "/dashboard");
     } else {
-      toast.error("Invalid credentials. Try STU001/password123 or ADM001/admin123");
+      toast.error("Invalid credentials. Please check your register number and password.");
     }
   };
 
