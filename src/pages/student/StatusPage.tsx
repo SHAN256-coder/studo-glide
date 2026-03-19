@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext, ApplicationStatus, ApplicationType } from "@/contexts/AppContext";
-import { QRCodeSVG } from "qrcode.react";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string }> = {
@@ -26,7 +25,7 @@ const StatusPage = () => {
     <div className="space-y-6 pb-20 sm:pb-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-xl font-display font-bold gold-gradient-text">Application Status</h2>
-        <p className="text-sm text-muted-foreground">Track your applications & QR codes</p>
+        <p className="text-sm text-muted-foreground">Track your applications</p>
       </motion.div>
 
       <div className="space-y-4">
@@ -49,6 +48,9 @@ const StatusPage = () => {
                 <h4 className="text-base font-semibold text-card-foreground">{typeLabels[app.type]}</h4>
                 <p className="text-sm text-muted-foreground mt-1">{app.fromDate} → {app.toDate}</p>
                 <p className="text-sm text-muted-foreground mt-1">{app.reason}</p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Submitted: {new Date(app.createdAt).toLocaleString()}
+                </p>
 
                 {/* Approval Progress */}
                 <div className="flex items-center gap-2 mt-3">
@@ -70,22 +72,15 @@ const StatusPage = () => {
                     {app.status === "approved" ? "Fully Approved" : app.status === "rejected" ? "Rejected" : `Level ${app.approvalLevel} of 3`}
                   </span>
                 </div>
-              </div>
 
-              {/* QR Code for approved */}
-              {app.status === "approved" && (
-                <div className="bg-card-foreground p-2 rounded-lg">
-                  <QRCodeSVG
-                    value={JSON.stringify({ id: app.id, student: app.registerNumber, type: app.type, validUntil: app.toDate })}
-                    size={80}
-                    level="M"
-                  />
-                </div>
-              )}
+                {app.comments && (
+                  <p className="text-xs text-muted-foreground mt-2 italic">Comment: {app.comments}</p>
+                )}
+              </div>
             </div>
           </motion.div>
         ))}
-        {apps.length === 0 && <p className="text-center text-muted-foreground py-12">No applications found</p>}
+        {apps.length === 0 && <p className="text-center text-muted-foreground py-12">No applications found. Submit one from the Apply page.</p>}
       </div>
     </div>
   );

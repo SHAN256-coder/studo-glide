@@ -23,7 +23,7 @@ const LoginPage = () => {
       toast.success("Login successful!");
       navigate(role === "admin" ? "/admin" : "/dashboard");
     } else {
-      toast.error("Invalid credentials. Try STU001/password123 or ADM001/admin123");
+      toast.error("Invalid credentials. Please check your register number and password.");
     }
   };
 
@@ -84,7 +84,7 @@ const LoginPage = () => {
             <Input
               value={registerNumber}
               onChange={(e) => setRegisterNumber(e.target.value)}
-              placeholder={role === "student" ? "e.g. STU001" : "e.g. ADM001"}
+              placeholder="Enter your register number"
               className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary"
             />
           </div>
@@ -114,7 +114,7 @@ const LoginPage = () => {
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Demo: STU001 / password123 (Student) • ADM001 / admin123 (Admin)
+            Secure login for students and administrators
           </p>
         </form>
 

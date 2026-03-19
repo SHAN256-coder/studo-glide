@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard, FileText, User, Bell, LogOut, Menu, X, QrCode
+  LayoutDashboard, FileText, User, Bell, LogOut, Menu, X, ClipboardList, FileDown
 } from "lucide-react";
 import { useState } from "react";
 import collegeLogo from "@/assets/college-logo.png";
@@ -20,7 +20,8 @@ const StudentLayout = () => {
   const links = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/dashboard/apply", icon: FileText, label: "Apply" },
-    { to: "/dashboard/status", icon: QrCode, label: "Status" },
+    { to: "/dashboard/status", icon: ClipboardList, label: "Status" },
+    { to: "/dashboard/forms", icon: FileDown, label: "Forms" },
     { to: "/dashboard/profile", icon: User, label: "Profile" },
     { to: "/dashboard/notifications", icon: Bell, label: "Alerts" },
   ];

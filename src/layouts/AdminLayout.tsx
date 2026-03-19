@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  LayoutDashboard, FileCheck, BarChart3, QrCode, LogOut, Menu, X
+  LayoutDashboard, FileCheck, BarChart3, LogOut, Menu, X
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -20,7 +20,6 @@ const AdminLayout = () => {
   const links = [
     { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/admin/applications", icon: FileCheck, label: "Applications" },
-    { to: "/admin/scanner", icon: QrCode, label: "QR Scanner" },
     { to: "/admin/analytics", icon: BarChart3, label: "Analytics" },
   ];
 

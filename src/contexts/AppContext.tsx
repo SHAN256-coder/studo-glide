@@ -38,57 +38,11 @@ export interface Notification {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-const INITIAL_APPS: Application[] = [
-  {
-    id: "APP001",
-    studentId: "1",
-    studentName: "Arjun Kumar",
-    registerNumber: "STU001",
-    department: "Computer Science",
-    type: "od",
-    status: "pending",
-    fromDate: "2026-03-20",
-    toDate: "2026-03-20",
-    reason: "Attending technical symposium at IIT Madras",
-    createdAt: "2026-03-18T10:00:00",
-    approvalLevel: 0,
-  },
-  {
-    id: "APP002",
-    studentId: "1",
-    studentName: "Arjun Kumar",
-    registerNumber: "STU001",
-    department: "Computer Science",
-    type: "leave",
-    status: "approved",
-    fromDate: "2026-03-15",
-    toDate: "2026-03-16",
-    reason: "Family function",
-    createdAt: "2026-03-14T08:00:00",
-    approvalLevel: 3,
-  },
-  {
-    id: "APP003",
-    studentId: "1",
-    studentName: "Arjun Kumar",
-    registerNumber: "STU001",
-    department: "Computer Science",
-    type: "internship",
-    status: "approved-l1",
-    fromDate: "2026-04-01",
-    toDate: "2026-04-30",
-    reason: "Summer internship at TCS, Chennai",
-    createdAt: "2026-03-10T09:00:00",
-    approvalLevel: 1,
-  },
-];
+const INITIAL_APPS: Application[] = [];
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<Application[]>(INITIAL_APPS);
-  const [notifications] = useState<Notification[]>([
-    { id: "N1", message: "Your leave application has been approved", timestamp: "2026-03-16T10:00:00", read: false, type: "approval" },
-    { id: "N2", message: "Internship application forwarded to Level 2", timestamp: "2026-03-12T14:00:00", read: true, type: "info" },
-  ]);
+  const [notifications] = useState<Notification[]>([]);
 
   const addApplication = (app: Omit<Application, "id" | "createdAt" | "status" | "approvalLevel">) => {
     const newApp: Application = {
