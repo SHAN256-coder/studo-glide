@@ -84,7 +84,7 @@ const LoginPage = () => {
             <Input
               value={registerNumber}
               onChange={(e) => setRegisterNumber(e.target.value)}
-              placeholder={role === "student" ? "e.g. STU001" : "e.g. ADM001"}
+              placeholder="Enter your register number"
               className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary"
             />
           </div>
