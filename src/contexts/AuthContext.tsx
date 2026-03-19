@@ -54,8 +54,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   const login = (registerNumber: string, password: string, role: UserRole): boolean => {
-    const found = MOCK_USERS[registerNumber];
-    if (found && found.password === password && found.role === role) {
+    const key = `${registerNumber}_${role}`;
+    const found = MOCK_USERS[key];
+    if (found && found.password === password) {
       const { password: _, ...userData } = found;
       setUser(userData);
       return true;
