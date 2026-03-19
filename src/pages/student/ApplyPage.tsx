@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
-import { Send, FileText, Briefcase, Building2, Home, BookOpen } from "lucide-react";
+import { Send, FileText, Briefcase, Building2, Home, BookOpen, GraduationCap } from "lucide-react";
 
 const typeConfig: Record<ApplicationType, { label: string; icon: typeof FileText; description: string }> = {
   od: { label: "On Duty (OD)", icon: BookOpen, description: "For attending events, workshops, or competitions" },
@@ -17,6 +17,7 @@ const typeConfig: Record<ApplicationType, { label: string; icon: typeof FileText
   internship: { label: "Internship", icon: Briefcase, description: "For internship period approval" },
   "industrial-visit": { label: "Industrial Visit", icon: Building2, description: "Company/factory visit with department" },
   "hostel-od": { label: "Hostel OD", icon: Home, description: "Permission to leave hostel (max 2/week)" },
+  "day-scholar-od": { label: "Day Scholar OD", icon: GraduationCap, description: "OD for day scholars attending external events" },
 };
 
 const ApplyPage = () => {
