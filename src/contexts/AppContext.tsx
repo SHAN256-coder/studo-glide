@@ -42,10 +42,7 @@ const INITIAL_APPS: Application[] = [];
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<Application[]>(INITIAL_APPS);
-  const [notifications] = useState<Notification[]>([
-    { id: "N1", message: "Your leave application has been approved", timestamp: "2026-03-16T10:00:00", read: false, type: "approval" },
-    { id: "N2", message: "Internship application forwarded to Level 2", timestamp: "2026-03-12T14:00:00", read: true, type: "info" },
-  ]);
+  const [notifications] = useState<Notification[]>([]);
 
   const addApplication = (app: Omit<Application, "id" | "createdAt" | "status" | "approvalLevel">) => {
     const newApp: Application = {

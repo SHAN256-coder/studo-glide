@@ -114,7 +114,7 @@ const LoginPage = () => {
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Demo: STU001 / password123 (Student) • ADM001 / admin123 (Admin)
+            Secure login for students and administrators
           </p>
         </form>
 

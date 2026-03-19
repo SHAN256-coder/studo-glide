@@ -20,7 +20,6 @@ const AdminLayout = () => {
   const links = [
     { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/admin/applications", icon: FileCheck, label: "Applications" },
-    { to: "/admin/scanner", icon: QrCode, label: "QR Scanner" },
     { to: "/admin/analytics", icon: BarChart3, label: "Analytics" },
   ];
 

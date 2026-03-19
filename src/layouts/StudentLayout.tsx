@@ -20,7 +20,8 @@ const StudentLayout = () => {
   const links = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/dashboard/apply", icon: FileText, label: "Apply" },
-    { to: "/dashboard/status", icon: QrCode, label: "Status" },
+    { to: "/dashboard/status", icon: ClipboardList, label: "Status" },
+    { to: "/dashboard/forms", icon: FileDown, label: "Forms" },
     { to: "/dashboard/profile", icon: User, label: "Profile" },
     { to: "/dashboard/notifications", icon: Bell, label: "Alerts" },
   ];

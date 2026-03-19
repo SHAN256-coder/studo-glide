@@ -12,10 +12,10 @@ import ApplyPage from "@/pages/student/ApplyPage";
 import StatusPage from "@/pages/student/StatusPage";
 import ProfilePage from "@/pages/student/ProfilePage";
 import NotificationsPage from "@/pages/student/NotificationsPage";
+import ConsentFormPage from "@/pages/student/ConsentFormPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
-import ScannerPage from "@/pages/admin/ScannerPage";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
 import NotFound from "@/pages/NotFound";
 
@@ -35,13 +35,13 @@ const AppRoutes = () => (
       <Route index element={<StudentDashboard />} />
       <Route path="apply" element={<ApplyPage />} />
       <Route path="status" element={<StatusPage />} />
+      <Route path="forms" element={<ConsentFormPage />} />
       <Route path="profile" element={<ProfilePage />} />
       <Route path="notifications" element={<NotificationsPage />} />
     </Route>
     <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
       <Route index element={<AdminDashboard />} />
       <Route path="applications" element={<AdminApplications />} />
-      <Route path="scanner" element={<ScannerPage />} />
       <Route path="analytics" element={<AnalyticsPage />} />
     </Route>
     <Route path="*" element={<NotFound />} />
