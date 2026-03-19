@@ -12,7 +12,9 @@ import ApplyPage from "@/pages/student/ApplyPage";
 import StatusPage from "@/pages/student/StatusPage";
 import ProfilePage from "@/pages/student/ProfilePage";
 import NotificationsPage from "@/pages/student/NotificationsPage";
+import FormsHubPage from "@/pages/student/FormsHubPage";
 import ConsentFormPage from "@/pages/student/ConsentFormPage";
+import HostelLeaveFormPage from "@/pages/student/HostelLeaveFormPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
@@ -35,7 +37,9 @@ const AppRoutes = () => (
       <Route index element={<StudentDashboard />} />
       <Route path="apply" element={<ApplyPage />} />
       <Route path="status" element={<StatusPage />} />
-      <Route path="forms" element={<ConsentFormPage />} />
+      <Route path="forms" element={<FormsHubPage />} />
+      <Route path="forms/internship-consent" element={<ConsentFormPage />} />
+      <Route path="forms/hostel-leave" element={<HostelLeaveFormPage />} />
       <Route path="profile" element={<ProfilePage />} />
       <Route path="notifications" element={<NotificationsPage />} />
     </Route>
