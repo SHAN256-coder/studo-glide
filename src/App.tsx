@@ -1,25 +1,65 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AppProvider } from "@/contexts/AppContext";
+import LoginPage from "@/pages/LoginPage";
+import StudentLayout from "@/layouts/StudentLayout";
+import StudentDashboard from "@/pages/student/StudentDashboard";
+import ApplyPage from "@/pages/student/ApplyPage";
+import StatusPage from "@/pages/student/StatusPage";
+import ProfilePage from "@/pages/student/ProfilePage";
+import NotificationsPage from "@/pages/student/NotificationsPage";
+import AdminLayout from "@/layouts/AdminLayout";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminApplications from "@/pages/admin/AdminApplications";
+import ScannerPage from "@/pages/admin/ScannerPage";
+import AnalyticsPage from "@/pages/admin/AnalyticsPage";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function ProtectedRoute({ children, role }: { children: React.ReactNode; role: string }) {
+  const { user, isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (user?.role !== role) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<LoginPage />} />
+    <Route path="/dashboard" element={<ProtectedRoute role="student"><StudentLayout /></ProtectedRoute>}>
+      <Route index element={<StudentDashboard />} />
+      <Route path="apply" element={<ApplyPage />} />
+      <Route path="status" element={<StatusPage />} />
+      <Route path="profile" element={<ProfilePage />} />
+      <Route path="notifications" element={<NotificationsPage />} />
+    </Route>
+    <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
+      <Route index element={<AdminDashboard />} />
+      <Route path="applications" element={<AdminApplications />} />
+      <Route path="scanner" element={<ScannerPage />} />
+      <Route path="analytics" element={<AnalyticsPage />} />
+    </Route>
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <AppProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </AppProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
