@@ -25,11 +25,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const MOCK_USERS: Record<string, User & { password: string }> = {
-  "STU001": {
+  "12345678_student": {
     id: "1",
     name: "Arjun Kumar",
-    registerNumber: "STU001",
-    password: "password123",
+    registerNumber: "12345678",
+    password: "1234",
     role: "student",
     department: "Computer Science",
     section: "A",
@@ -38,11 +38,11 @@ const MOCK_USERS: Record<string, User & { password: string }> = {
     cgpa: 8.5,
     college: "Dhaanish Ahmed College of Engineering",
   },
-  "ADM001": {
+  "12345678_admin": {
     id: "2",
     name: "Dr. Priya Sharma",
-    registerNumber: "ADM001",
-    password: "admin123",
+    registerNumber: "12345678",
+    password: "5678",
     role: "admin",
     department: "Computer Science",
     mobile: "9876543211",
@@ -54,8 +54,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   const login = (registerNumber: string, password: string, role: UserRole): boolean => {
-    const found = MOCK_USERS[registerNumber];
-    if (found && found.password === password && found.role === role) {
+    const key = `${registerNumber}_${role}`;
+    const found = MOCK_USERS[key];
+    if (found && found.password === password) {
       const { password: _, ...userData } = found;
       setUser(userData);
       return true;
