@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
 export type UserRole = "student" | "admin";
 
@@ -10,15 +10,22 @@ export interface User {
   department?: string;
   section?: string;
   semester?: number;
+  year?: number;
   mobile?: string;
   cgpa?: number;
   college?: string;
+  profilePicture?: string;
+  githubId?: string;
+  linkedinId?: string;
+  resumeLink?: string;
+  portfolioLink?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (registerNumber: string, password: string, role: UserRole) => boolean;
   logout: () => void;
+  updateProfile: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
 }
 
@@ -31,9 +38,10 @@ const MOCK_USERS: Record<string, User & { password: string }> = {
     registerNumber: "12345678",
     password: "1234",
     role: "student",
-    department: "Computer Science",
+    department: "ECE",
     section: "A",
     semester: 5,
+    year: 3,
     mobile: "9876543210",
     cgpa: 8.5,
     college: "Dhaanish Ahmed College of Engineering",
@@ -44,11 +52,23 @@ const MOCK_USERS: Record<string, User & { password: string }> = {
     registerNumber: "12345678",
     password: "5678",
     role: "admin",
-    department: "Computer Science",
+    department: "ECE",
     mobile: "9876543211",
     college: "Dhaanish Ahmed College of Engineering",
   },
 };
+
+export const DEPARTMENTS = [
+  "ECE",
+  "AIDS",
+  "EEE",
+  "CSBS",
+  "PETRO",
+  "ROBO",
+];
+
+export const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
+export const YEARS = [1, 2, 3, 4];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -66,8 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => setUser(null);
 
+  const updateProfile = useCallback((updates: Partial<User>) => {
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, logout, updateProfile, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

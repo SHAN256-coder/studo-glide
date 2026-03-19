@@ -18,6 +18,7 @@ const typeLabels: Record<ApplicationType, string> = {
   internship: "Internship",
   "industrial-visit": "Industrial Visit",
   "hostel-od": "Hostel OD",
+  "day-scholar-od": "Day Scholar OD",
 };
 
 const StudentDashboard = () => {
@@ -72,7 +73,7 @@ const StudentDashboard = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {(["od", "leave", "hostel-od"] as ApplicationType[]).map((type) => (
+          {(["od", "leave", "hostel-od", "day-scholar-od"] as ApplicationType[]).map((type) => (
             <Link key={type} to={`/dashboard/apply?type=${type}`}
               className="glass-card-hover p-4 text-center">
               <FileText className="mx-auto mb-2 text-primary" size={20} />

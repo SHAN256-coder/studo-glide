@@ -1,19 +1,31 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { FileText, Home } from "lucide-react";
+import { FileText, Home, Briefcase, CalendarOff } from "lucide-react";
 
 const forms = [
   {
-    to: "/dashboard/forms/internship-consent",
-    icon: FileText,
-    title: "Internship Consent Form",
-    description: "Student–Parents consent form for internship with all required fields",
+    to: "/dashboard/forms/od-form",
+    icon: Briefcase,
+    title: "On Duty (OD) Form",
+    description: "Permission form for attending events, workshops, and programs",
+  },
+  {
+    to: "/dashboard/forms/leave-form",
+    icon: CalendarOff,
+    title: "Leave Application Form",
+    description: "Sick leave, personal leave, family emergency — with class advisor & HOD sign-off",
   },
   {
     to: "/dashboard/forms/hostel-leave",
     icon: Home,
     title: "Hostel Leave Form",
     description: "Department Copy + Warden Copy — auto-fills both copies from one form",
+  },
+  {
+    to: "/dashboard/forms/internship-consent",
+    icon: FileText,
+    title: "Internship Consent Form",
+    description: "Student–Parents consent form for internship with all required fields",
   },
 ];
 

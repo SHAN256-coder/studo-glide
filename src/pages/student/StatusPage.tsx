@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext, ApplicationStatus, ApplicationType } from "@/contexts/AppContext";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string }> = {
   pending: { label: "Pending", className: "status-pending" },
@@ -14,6 +15,7 @@ const statusConfig: Record<ApplicationStatus, { label: string; className: string
 const typeLabels: Record<ApplicationType, string> = {
   od: "On Duty", leave: "Leave", internship: "Internship",
   "industrial-visit": "Industrial Visit", "hostel-od": "Hostel OD",
+  "day-scholar-od": "Day Scholar OD",
 };
 
 const StatusPage = () => {
@@ -39,11 +41,12 @@ const StatusPage = () => {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig[app.status].className}`}>
                     {statusConfig[app.status].label}
                   </span>
                   <span className="text-xs text-muted-foreground">#{app.id}</span>
+                  <span className="text-xs font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">{app.trackingId}</span>
                 </div>
                 <h4 className="text-base font-semibold text-card-foreground">{typeLabels[app.type]}</h4>
                 <p className="text-sm text-muted-foreground mt-1">{app.fromDate} → {app.toDate}</p>
@@ -76,6 +79,11 @@ const StatusPage = () => {
                 {app.comments && (
                   <p className="text-xs text-muted-foreground mt-2 italic">Comment: {app.comments}</p>
                 )}
+              </div>
+
+              {/* QR Code */}
+              <div className="flex-shrink-0 bg-white p-1.5 rounded">
+                <QRCodeSVG value={`${app.trackingId}|${app.type}|${app.status}|${app.studentName}`} size={56} />
               </div>
             </div>
           </motion.div>

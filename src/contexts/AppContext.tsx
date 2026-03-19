@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { toast } from "sonner";
 
-export type ApplicationType = "od" | "leave" | "internship" | "industrial-visit" | "hostel-od";
+export type ApplicationType = "od" | "leave" | "internship" | "industrial-visit" | "hostel-od" | "day-scholar-od";
 export type ApplicationStatus = "pending" | "approved-l1" | "approved-l2" | "approved" | "rejected";
 
 export interface Application {
   id: string;
+  trackingId: string;
   studentId: string;
   studentName: string;
   registerNumber: string;
@@ -32,18 +33,21 @@ export interface Notification {
 
 interface AppContextType {
   applications: Application[];
-  addApplication: (app: Omit<Application, "id" | "createdAt" | "status" | "approvalLevel">) => void;
+  addApplication: (app: Omit<Application, "id" | "trackingId" | "createdAt" | "status" | "approvalLevel">) => void;
   updateStatus: (id: string, status: ApplicationStatus, comments?: string) => void;
   getStudentApplications: (studentId: string) => Application[];
   notifications: Notification[];
   unreadCount: number;
   markNotificationRead: (id: string) => void;
   markAllRead: () => void;
+  soundEnabled: boolean;
+  toggleSound: () => void;
 }
 
-const typeLabels: Record<ApplicationType, string> = {
+export const typeLabels: Record<ApplicationType, string> = {
   od: "On Duty", leave: "Leave", internship: "Internship",
   "industrial-visit": "Industrial Visit", "hostel-od": "Hostel OD",
+  "day-scholar-od": "Day Scholar OD",
 };
 
 const statusLabels: Record<ApplicationStatus, string> = {
@@ -54,11 +58,24 @@ const statusLabels: Record<ApplicationStatus, string> = {
   rejected: "rejected",
 };
 
+function generateTrackingId(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const prefix = "TRK";
+  let result = prefix;
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+
+  const toggleSound = useCallback(() => setSoundEnabled((prev) => !prev), []);
 
   const addNotification = useCallback((message: string, type: Notification["type"], applicationId?: string) => {
     const newNotif: Notification = {
@@ -71,7 +88,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setNotifications((prev) => [newNotif, ...prev]);
 
-    // Push toast notification in real-time
     if (type === "approval") {
       toast.success(message, { duration: 5000 });
     } else if (type === "rejection") {
@@ -81,17 +97,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const addApplication = useCallback((app: Omit<Application, "id" | "createdAt" | "status" | "approvalLevel">) => {
+  const addApplication = useCallback((app: Omit<Application, "id" | "trackingId" | "createdAt" | "status" | "approvalLevel">) => {
     const newApp: Application = {
       ...app,
       id: `APP${String(Date.now()).slice(-5)}`,
+      trackingId: generateTrackingId(),
       status: "pending",
       createdAt: new Date().toISOString(),
       approvalLevel: 0,
     };
     setApplications((prev) => [newApp, ...prev]);
     addNotification(
-      `Your ${typeLabels[app.type]} application has been submitted successfully`,
+      `Your ${typeLabels[app.type]} application has been submitted. Tracking ID: ${newApp.trackingId}`,
       "info",
       newApp.id
     );
@@ -108,13 +125,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           approvalLevel: status === "approved" ? 3 : status === "approved-l2" ? 2 : status === "approved-l1" ? 1 : app.approvalLevel,
         };
 
-        // Generate notification for the student
         const statusText = statusLabels[status];
         const commentText = comments ? ` — "${comments}"` : "";
         const notifType: Notification["type"] = status === "rejected" ? "rejection" : status === "approved" ? "approval" : "info";
-        const message = `Your ${typeLabels[app.type]} application (#${app.id}) has been ${statusText}${commentText}`;
+        const message = `Your ${typeLabels[app.type]} application (${app.trackingId}) has been ${statusText}${commentText}`;
 
-        // Use setTimeout to avoid setState during render
         setTimeout(() => addNotification(message, notifType, app.id), 0);
 
         return newApp;
@@ -142,6 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       applications, addApplication, updateStatus, getStudentApplications,
       notifications, unreadCount, markNotificationRead, markAllRead,
+      soundEnabled, toggleSound,
     }}>
       {children}
     </AppContext.Provider>

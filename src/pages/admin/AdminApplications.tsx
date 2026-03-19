@@ -10,6 +10,7 @@ import { Check, X, Filter } from "lucide-react";
 const typeLabels: Record<ApplicationType, string> = {
   od: "On Duty", leave: "Leave", internship: "Internship",
   "industrial-visit": "Industrial Visit", "hostel-od": "Hostel OD",
+  "day-scholar-od": "Day Scholar OD",
 };
 
 const statusLabels: Record<ApplicationStatus, string> = {
