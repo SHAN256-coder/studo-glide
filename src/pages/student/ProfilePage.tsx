@@ -1,35 +1,112 @@
-import { motion } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth, DEPARTMENTS, SEMESTERS, YEARS } from "@/contexts/AuthContext";
 import { useAppContext } from "@/contexts/AppContext";
-import { User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar } from "lucide-react";
+import {
+  User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar,
+  Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { QRCodeSVG } from "qrcode.react";
+import { toast } from "sonner";
 
 const ProfilePage = () => {
-  const { user } = useAuth();
-  const { getStudentApplications } = useAppContext();
+  const { user, updateProfile } = useAuth();
+  const { getStudentApplications, soundEnabled, toggleSound } = useAppContext();
   const apps = getStudentApplications(user?.id || "");
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({ ...user });
+
+  const startEdit = () => {
+    setDraft({ ...user });
+    setEditing(true);
+  };
+
+  const cancelEdit = () => setEditing(false);
+
+  const saveEdit = () => {
+    updateProfile(draft as any);
+    setEditing(false);
+    toast.success("Profile updated!");
+  };
+
+  const handlePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const url = reader.result as string;
+        setDraft((prev) => ({ ...prev, profilePicture: url }));
+        if (!editing) updateProfile({ profilePicture: url });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const fields = [
-    { label: "Name", value: user?.name, icon: User },
-    { label: "Register Number", value: user?.registerNumber, icon: GraduationCap },
-    { label: "Mobile", value: user?.mobile, icon: Phone },
-    { label: "Department", value: user?.department, icon: BookOpen },
-    { label: "Section", value: user?.section, icon: Building2 },
-    { label: "Semester", value: user?.semester, icon: Calendar },
-    { label: "CGPA", value: user?.cgpa, icon: Award },
-    { label: "College", value: user?.college, icon: Building2 },
+    { label: "Name", key: "name", icon: User, editable: true, type: "text" },
+    { label: "Register Number", key: "registerNumber", icon: GraduationCap, editable: false },
+    { label: "Mobile", key: "mobile", icon: Phone, editable: true, type: "tel" },
+    { label: "Department", key: "department", icon: BookOpen, editable: true, type: "select", options: DEPARTMENTS },
+    { label: "Section", key: "section", icon: Building2, editable: true, type: "text" },
+    { label: "Year", key: "year", icon: Calendar, editable: true, type: "select", options: YEARS },
+    { label: "Semester", key: "semester", icon: Calendar, editable: true, type: "select", options: SEMESTERS },
+    { label: "CGPA", key: "cgpa", icon: Award, editable: true, type: "number" },
+    { label: "College", key: "college", icon: Building2, editable: true, type: "text" },
   ];
+
+  const socialFields = [
+    { label: "GitHub", key: "githubId", icon: Github, placeholder: "github.com/username" },
+    { label: "LinkedIn", key: "linkedinId", icon: Linkedin, placeholder: "linkedin.com/in/username" },
+    { label: "Resume", key: "resumeLink", icon: FileText, placeholder: "https://resume-link.com" },
+    { label: "Portfolio", key: "portfolioLink", icon: Globe, placeholder: "https://portfolio.com" },
+  ];
+
+  const displayVal = (key: string) => {
+    const val = editing ? (draft as any)?.[key] : (user as any)?.[key];
+    return val !== undefined && val !== null ? String(val) : "";
+  };
 
   return (
     <div className="space-y-6 pb-20 sm:pb-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      {/* Header with Edit / Sound Toggle */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <h2 className="text-xl font-display font-bold gold-gradient-text">Profile</h2>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+            <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-75" />
+          </div>
+          {!editing ? (
+            <Button size="sm" variant="outline" onClick={startEdit} className="gap-1.5">
+              <Edit3 size={14} /> Edit
+            </Button>
+          ) : (
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="default" onClick={saveEdit} className="gap-1"><Save size={14} /> Save</Button>
+              <Button size="sm" variant="ghost" onClick={cancelEdit}><X size={14} /></Button>
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* Avatar & Name */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="glass-card p-6 text-center">
-        <div className="w-20 h-20 rounded-full bg-primary mx-auto flex items-center justify-center text-primary-foreground text-2xl font-bold mb-3">
-          {user?.name?.charAt(0)}
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-6 text-center relative">
+        <div className="relative w-20 h-20 mx-auto mb-3">
+          {(editing ? draft?.profilePicture : user?.profilePicture) ? (
+            <img src={(editing ? draft?.profilePicture : user?.profilePicture)!} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-primary" />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold">
+              {user?.name?.charAt(0)}
+            </div>
+          )}
+          <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
+            <Camera size={14} className="text-primary-foreground" />
+            <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
+          </label>
         </div>
         <h3 className="text-lg font-bold text-card-foreground">{user?.name}</h3>
         <p className="text-sm text-muted-foreground">{user?.registerNumber} • {user?.department}</p>
@@ -37,21 +114,80 @@ const ProfilePage = () => {
 
       {/* Details */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {fields.map((field, i) => (
-          <motion.div key={field.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className="glass-card p-4 flex items-center gap-3">
-            <field.icon size={18} className="text-primary flex-shrink-0" />
-            <div>
-              <p className="text-xs text-muted-foreground">{field.label}</p>
-              <p className="text-sm font-medium text-card-foreground">{field.value || "—"}</p>
-            </div>
-          </motion.div>
-        ))}
+        <AnimatePresence mode="wait">
+          {fields.map((field, i) => (
+            <motion.div
+              key={field.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+              className="glass-card p-4 flex items-center gap-3"
+            >
+              <field.icon size={18} className="text-primary flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">{field.label}</p>
+                {editing && field.editable ? (
+                  field.type === "select" ? (
+                    <Select value={displayVal(field.key)} onValueChange={(v) => setDraft((prev) => ({ ...prev, [field.key]: field.options?.[0] && typeof field.options[0] === "number" ? Number(v) : v }))}>
+                      <SelectTrigger className="h-8 text-sm mt-0.5"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {field.options?.map((opt) => (
+                          <SelectItem key={String(opt)} value={String(opt)}>{String(opt)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      type={field.type}
+                      value={displayVal(field.key)}
+                      onChange={(e) => setDraft((prev) => ({ ...prev, [field.key]: field.type === "number" ? Number(e.target.value) : e.target.value }))}
+                      className="h-8 text-sm mt-0.5"
+                    />
+                  )
+                ) : (
+                  <p className="text-sm font-medium text-card-foreground truncate">{displayVal(field.key) || "—"}</p>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
+      {/* Social / Links */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="glass-card p-5 space-y-3">
+        <h3 className="text-base font-semibold text-card-foreground">Links & Socials</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {socialFields.map((sf) => (
+            <div key={sf.key} className="flex items-center gap-2">
+              <sf.icon size={16} className="text-primary flex-shrink-0" />
+              {editing ? (
+                <Input
+                  placeholder={sf.placeholder}
+                  value={displayVal(sf.key)}
+                  onChange={(e) => setDraft((prev) => ({ ...prev, [sf.key]: e.target.value }))}
+                  className="h-8 text-sm"
+                />
+              ) : (
+                <span className="text-sm text-card-foreground truncate">
+                  {displayVal(sf.key) || <span className="text-muted-foreground italic">Not set</span>}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* QR Code */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-5 text-center">
+        <h3 className="text-base font-semibold text-card-foreground mb-3">Your Profile QR</h3>
+        <div className="inline-block bg-white p-3 rounded-lg">
+          <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">Scan to verify student identity</p>
+      </motion.div>
+
       {/* History Summary */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-        className="glass-card p-5">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="glass-card p-5">
         <h3 className="text-base font-semibold text-card-foreground mb-3">Application History</h3>
         <div className="flex gap-4 text-center">
           <div className="flex-1">
@@ -59,11 +195,11 @@ const ProfilePage = () => {
             <p className="text-xs text-muted-foreground">Total</p>
           </div>
           <div className="flex-1">
-            <p className="text-xl font-bold text-success">{apps.filter(a => a.status === "approved").length}</p>
+            <p className="text-xl font-bold text-success">{apps.filter((a) => a.status === "approved").length}</p>
             <p className="text-xs text-muted-foreground">Approved</p>
           </div>
           <div className="flex-1">
-            <p className="text-xl font-bold text-destructive">{apps.filter(a => a.status === "rejected").length}</p>
+            <p className="text-xl font-bold text-destructive">{apps.filter((a) => a.status === "rejected").length}</p>
             <p className="text-xs text-muted-foreground">Rejected</p>
           </div>
         </div>
