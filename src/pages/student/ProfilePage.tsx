@@ -94,7 +94,7 @@ const ProfilePage = () => {
       </motion.div>
 
       {/* Avatar & Name */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-6 text-center relative">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 text-center relative">
         <div className="relative w-20 h-20 mx-auto mb-3">
           {(editing ? draft?.profilePicture : user?.profilePicture) ? (
             <img src={(editing ? draft?.profilePicture : user?.profilePicture)!} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-primary" />
