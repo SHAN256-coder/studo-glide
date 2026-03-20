@@ -17,6 +17,7 @@ import ConsentFormPage from "@/pages/student/ConsentFormPage";
 import HostelLeaveFormPage from "@/pages/student/HostelLeaveFormPage";
 import ODFormPage from "@/pages/student/ODFormPage";
 import LeaveFormPage from "@/pages/student/LeaveFormPage";
+import DayScholarODFormPage from "@/pages/student/DayScholarODFormPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
@@ -44,6 +45,7 @@ const AppRoutes = () => (
       <Route path="forms/hostel-leave" element={<HostelLeaveFormPage />} />
       <Route path="forms/od-form" element={<ODFormPage />} />
       <Route path="forms/leave-form" element={<LeaveFormPage />} />
+      <Route path="forms/day-scholar-od" element={<DayScholarODFormPage />} />
       <Route path="profile" element={<ProfilePage />} />
       <Route path="notifications" element={<NotificationsPage />} />
     </Route>
