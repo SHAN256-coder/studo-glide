@@ -72,7 +72,7 @@ const StudentDashboard = () => {
             View all <ArrowRight size={14} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {(["od", "leave", "hostel-od", "day-scholar-od"] as ApplicationType[]).map((type) => (
             <Link key={type} to={`/dashboard/apply?type=${type}`}
               className="glass-card-hover p-4 text-center">

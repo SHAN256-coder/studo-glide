@@ -187,7 +187,7 @@ const ProfilePage = () => {
       </motion.div>
 
       {/* History Summary */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="glass-card p-5">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="glass-card p-3 sm:p-5">
         <h3 className="text-base font-semibold text-card-foreground mb-3">Application History</h3>
         <div className="flex gap-4 text-center">
           <div className="flex-1">

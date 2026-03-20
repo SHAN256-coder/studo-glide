@@ -66,15 +66,15 @@ const LeaveFormPage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-20 sm:pb-6">
+    <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-xl font-display font-bold gold-gradient-text">Leave Form</h2>
-        <p className="text-sm text-muted-foreground">Fill details and download as PDF/JPG</p>
+        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Leave Form</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">Fill details and download as PDF/JPG</p>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="glass-card p-5 space-y-4">
-        <h3 className="text-base font-semibold text-card-foreground">Fill Form Details</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="glass-card p-3 sm:p-5 space-y-3 sm:space-y-4">
+        <h3 className="text-sm sm:text-base font-semibold text-card-foreground">Fill Form Details</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <Input placeholder="Date" type="date" value={formData.date} onChange={(e) => set("date", e.target.value)} />
           <Input placeholder="Student Name" value={formData.name} onChange={(e) => set("name", e.target.value)} />
           <Input placeholder="Register Number" value={formData.registerNumber} onChange={(e) => set("registerNumber", e.target.value)} />
@@ -107,9 +107,9 @@ const LeaveFormPage = () => {
         <Textarea placeholder="Address (if going home)" value={formData.address} onChange={(e) => set("address", e.target.value)} rows={2} />
       </motion.div>
 
-      <div className="flex gap-3">
-        <Button onClick={handleSavePDF} className="gap-2 flex-1"><Download size={16} /> Save as PDF</Button>
-        <Button onClick={handleSaveJPG} variant="outline" className="gap-2 flex-1"><FileImage size={16} /> Save as JPG</Button>
+      <div className="flex gap-2 sm:gap-3">
+        <Button onClick={handleSavePDF} className="gap-1.5 sm:gap-2 flex-1 text-xs sm:text-sm"><Download size={14} /> Save as PDF</Button>
+        <Button onClick={handleSaveJPG} variant="outline" className="gap-1.5 sm:gap-2 flex-1 text-xs sm:text-sm"><FileImage size={14} /> Save as JPG</Button>
       </div>
 
       {/* Printable Form Preview */}
