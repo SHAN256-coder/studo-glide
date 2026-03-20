@@ -48,7 +48,7 @@ const StudentDashboard = () => {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
         {statCards.map((stat, i) => (
           <motion.div
             key={stat.label}
