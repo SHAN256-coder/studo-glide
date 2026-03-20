@@ -45,6 +45,7 @@ const AppRoutes = () => (
       <Route path="forms/hostel-leave" element={<HostelLeaveFormPage />} />
       <Route path="forms/od-form" element={<ODFormPage />} />
       <Route path="forms/leave-form" element={<LeaveFormPage />} />
+      <Route path="forms/day-scholar-od" element={<DayScholarODFormPage />} />
       <Route path="profile" element={<ProfilePage />} />
       <Route path="notifications" element={<NotificationsPage />} />
     </Route>

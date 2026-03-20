@@ -22,6 +22,12 @@ const forms = [
     description: "Department Copy + Warden Copy — auto-fills both copies from one form",
   },
   {
+    to: "/dashboard/forms/day-scholar-od",
+    icon: FileText,
+    title: "Day Scholar OD Form",
+    description: "On Duty permission form for day scholars with parent consent section",
+  },
+  {
     to: "/dashboard/forms/internship-consent",
     icon: FileText,
     title: "Internship Consent Form",

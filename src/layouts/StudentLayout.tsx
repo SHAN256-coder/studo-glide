@@ -1,22 +1,38 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext } from "@/contexts/AppContext";
-import { motion } from "framer-motion";
+import { useTapSound } from "@/hooks/useTapSound";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, FileText, User, Bell, LogOut, Menu, X, ClipboardList, FileDown
 } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import collegeLogo from "@/assets/college-logo.png";
+
+const pageVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
 
 const StudentLayout = () => {
   const { user, logout } = useAuth();
   const { unreadCount } = useAppContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const playTap = useTapSound();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
+    playTap();
     logout();
     navigate("/");
+  };
+
+  const handleNavClick = () => {
+    playTap();
+    setMobileMenuOpen(false);
   };
 
   const links = [
@@ -48,11 +64,11 @@ const StudentLayout = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <NavLink to="/dashboard/notifications" className="relative p-2 text-muted-foreground hover:text-card-foreground sm:hidden">
+          <NavLink to="/dashboard/notifications" className="relative p-2 text-muted-foreground hover:text-card-foreground sm:hidden" onClick={playTap}>
             <Bell size={20} />
             <NavBadge count={unreadCount} />
           </NavLink>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="sm:hidden text-card-foreground p-2">
+          <button onClick={() => { playTap(); setMobileMenuOpen(!mobileMenuOpen); }} className="sm:hidden text-card-foreground p-2">
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           <button onClick={handleLogout} className="text-muted-foreground hover:text-destructive transition-colors p-2" title="Logout">
@@ -73,7 +89,7 @@ const StudentLayout = () => {
               key={link.to}
               to={link.to}
               end={link.to === "/dashboard"}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={handleNavClick}
               className={({ isActive }) =>
                 `relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                   isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-card-foreground"
@@ -100,6 +116,7 @@ const StudentLayout = () => {
               key={link.to}
               to={link.to}
               end={link.to === "/dashboard"}
+              onClick={playTap}
               className={({ isActive }) =>
                 `relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                   isActive ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-card-foreground hover:bg-secondary"
@@ -115,9 +132,20 @@ const StudentLayout = () => {
           ))}
         </aside>
 
-        {/* Main Content */}
+        {/* Main Content with Page Transitions */}
         <main className="flex-1 p-3 sm:p-6 max-w-5xl w-full min-w-0">
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
@@ -128,16 +156,17 @@ const StudentLayout = () => {
             key={link.to}
             to={link.to}
             end={link.to === "/dashboard"}
+            onClick={playTap}
             className={({ isActive }) =>
               `relative flex flex-col items-center gap-0.5 text-xs transition-all ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`
             }
           >
-            <div className="relative">
+            <motion.div className="relative" whileTap={{ scale: 0.85 }} transition={{ duration: 0.1 }}>
               <link.icon size={20} />
               <NavBadge count={link.badge} />
-            </div>
+            </motion.div>
             {link.label}
           </NavLink>
         ))}
