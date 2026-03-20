@@ -55,11 +55,11 @@ const StudentDashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="glass-card-hover p-4 text-center"
+            className="glass-card-hover p-3 sm:p-4 text-center"
           >
-            <stat.icon className={`mx-auto mb-2 ${stat.color}`} size={24} />
-            <p className="text-2xl font-bold text-card-foreground">{stat.value}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+            <stat.icon className={`mx-auto mb-1.5 sm:mb-2 ${stat.color}`} size={20} />
+            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stat.value}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
           </motion.div>
         ))}
       </div>
