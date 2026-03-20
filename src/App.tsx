@@ -17,6 +17,7 @@ import ConsentFormPage from "@/pages/student/ConsentFormPage";
 import HostelLeaveFormPage from "@/pages/student/HostelLeaveFormPage";
 import ODFormPage from "@/pages/student/ODFormPage";
 import LeaveFormPage from "@/pages/student/LeaveFormPage";
+import DayScholarODFormPage from "@/pages/student/DayScholarODFormPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
