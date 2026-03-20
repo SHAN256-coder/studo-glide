@@ -178,7 +178,7 @@ const ProfilePage = () => {
       </motion.div>
 
       {/* QR Code */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-5 text-center">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-4 sm:p-5 text-center">
         <h3 className="text-base font-semibold text-card-foreground mb-3">Your Profile QR</h3>
         <div className="inline-block bg-white p-3 rounded-lg">
           <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
