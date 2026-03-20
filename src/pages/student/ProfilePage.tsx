@@ -154,7 +154,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Social / Links */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="glass-card p-5 space-y-3">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="glass-card p-3 sm:p-5 space-y-3">
         <h3 className="text-base font-semibold text-card-foreground">Links & Socials</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {socialFields.map((sf) => (
