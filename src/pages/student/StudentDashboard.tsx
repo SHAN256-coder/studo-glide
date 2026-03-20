@@ -41,10 +41,10 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <div className="space-y-6 pb-20 sm:pb-6">
+    <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
-        <p className="text-sm text-muted-foreground">Welcome back, {user?.name}</p>
+        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">Welcome back, {user?.name}</p>
       </motion.div>
 
       {/* Stats Grid */}
