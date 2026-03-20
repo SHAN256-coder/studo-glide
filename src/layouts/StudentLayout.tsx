@@ -116,7 +116,7 @@ const StudentLayout = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 sm:p-6 max-w-5xl">
+        <main className="flex-1 p-3 sm:p-6 max-w-5xl w-full min-w-0">
           <Outlet />
         </main>
       </div>
