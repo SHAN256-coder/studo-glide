@@ -41,25 +41,25 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <div className="space-y-6 pb-20 sm:pb-6">
+    <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
-        <p className="text-sm text-muted-foreground">Welcome back, {user?.name}</p>
+        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">Welcome back, {user?.name}</p>
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
         {statCards.map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="glass-card-hover p-4 text-center"
+            className="glass-card-hover p-3 sm:p-4 text-center"
           >
-            <stat.icon className={`mx-auto mb-2 ${stat.color}`} size={24} />
-            <p className="text-2xl font-bold text-card-foreground">{stat.value}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+            <stat.icon className={`mx-auto mb-1.5 sm:mb-2 ${stat.color}`} size={20} />
+            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stat.value}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
           </motion.div>
         ))}
       </div>
@@ -72,7 +72,7 @@ const StudentDashboard = () => {
             View all <ArrowRight size={14} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {(["od", "leave", "hostel-od", "day-scholar-od"] as ApplicationType[]).map((type) => (
             <Link key={type} to={`/dashboard/apply?type=${type}`}
               className="glass-card-hover p-4 text-center">

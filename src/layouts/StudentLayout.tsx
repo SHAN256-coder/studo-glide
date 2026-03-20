@@ -38,9 +38,9 @@ const StudentLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 glass-card border-b border-border/50 px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 glass-card border-b border-border/50 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
-          <img src={collegeLogo} alt="College" className="h-8 rounded" />
+          <img src={collegeLogo} alt="College" className="h-7 sm:h-8 rounded flex-shrink-0" />
           <div className="hidden sm:block">
             <h1 className="text-sm font-bold gold-gradient-text leading-tight">Campus OD & Leave</h1>
             <p className="text-xs text-muted-foreground">Welcome, {user?.name}</p>
@@ -116,7 +116,7 @@ const StudentLayout = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 sm:p-6 max-w-5xl">
+        <main className="flex-1 p-3 sm:p-6 max-w-5xl w-full min-w-0">
           <Outlet />
         </main>
       </div>

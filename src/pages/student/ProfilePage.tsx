@@ -71,30 +71,30 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-20 sm:pb-6">
+    <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       {/* Header with Edit / Sound Toggle */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
-        <h2 className="text-xl font-display font-bold gold-gradient-text">Profile</h2>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-            <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-75" />
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between gap-2">
+        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text flex-shrink-0">Profile</h2>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
+            {soundEnabled ? <Volume2 size={12} /> : <VolumeX size={12} />}
+            <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-[0.65] sm:scale-75" />
           </div>
           {!editing ? (
-            <Button size="sm" variant="outline" onClick={startEdit} className="gap-1.5">
-              <Edit3 size={14} /> Edit
+            <Button size="sm" variant="outline" onClick={startEdit} className="gap-1 text-xs h-7 sm:h-8 px-2 sm:px-3">
+              <Edit3 size={12} /> Edit
             </Button>
           ) : (
-            <div className="flex gap-1.5">
-              <Button size="sm" variant="default" onClick={saveEdit} className="gap-1"><Save size={14} /> Save</Button>
-              <Button size="sm" variant="ghost" onClick={cancelEdit}><X size={14} /></Button>
+            <div className="flex gap-1">
+              <Button size="sm" variant="default" onClick={saveEdit} className="gap-1 text-xs h-7 sm:h-8 px-2 sm:px-3"><Save size={12} /> Save</Button>
+              <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 sm:h-8 px-1.5"><X size={12} /></Button>
             </div>
           )}
         </div>
       </motion.div>
 
       {/* Avatar & Name */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-6 text-center relative">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 text-center relative">
         <div className="relative w-20 h-20 mx-auto mb-3">
           {(editing ? draft?.profilePicture : user?.profilePicture) ? (
             <img src={(editing ? draft?.profilePicture : user?.profilePicture)!} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-primary" />
@@ -154,7 +154,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Social / Links */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="glass-card p-5 space-y-3">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="glass-card p-3 sm:p-5 space-y-3">
         <h3 className="text-base font-semibold text-card-foreground">Links & Socials</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {socialFields.map((sf) => (
@@ -178,7 +178,7 @@ const ProfilePage = () => {
       </motion.div>
 
       {/* QR Code */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-5 text-center">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-4 sm:p-5 text-center">
         <h3 className="text-base font-semibold text-card-foreground mb-3">Your Profile QR</h3>
         <div className="inline-block bg-white p-3 rounded-lg">
           <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
@@ -187,7 +187,7 @@ const ProfilePage = () => {
       </motion.div>
 
       {/* History Summary */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="glass-card p-5">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="glass-card p-3 sm:p-5">
         <h3 className="text-base font-semibold text-card-foreground mb-3">Application History</h3>
         <div className="flex gap-4 text-center">
           <div className="flex-1">
