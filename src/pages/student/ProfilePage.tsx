@@ -71,23 +71,23 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-20 sm:pb-6">
+    <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       {/* Header with Edit / Sound Toggle */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
-        <h2 className="text-xl font-display font-bold gold-gradient-text">Profile</h2>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-            <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-75" />
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between gap-2">
+        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text flex-shrink-0">Profile</h2>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
+            {soundEnabled ? <Volume2 size={12} /> : <VolumeX size={12} />}
+            <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-[0.65] sm:scale-75" />
           </div>
           {!editing ? (
-            <Button size="sm" variant="outline" onClick={startEdit} className="gap-1.5">
-              <Edit3 size={14} /> Edit
+            <Button size="sm" variant="outline" onClick={startEdit} className="gap-1 text-xs h-7 sm:h-8 px-2 sm:px-3">
+              <Edit3 size={12} /> Edit
             </Button>
           ) : (
-            <div className="flex gap-1.5">
-              <Button size="sm" variant="default" onClick={saveEdit} className="gap-1"><Save size={14} /> Save</Button>
-              <Button size="sm" variant="ghost" onClick={cancelEdit}><X size={14} /></Button>
+            <div className="flex gap-1">
+              <Button size="sm" variant="default" onClick={saveEdit} className="gap-1 text-xs h-7 sm:h-8 px-2 sm:px-3"><Save size={12} /> Save</Button>
+              <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 sm:h-8 px-1.5"><X size={12} /></Button>
             </div>
           )}
         </div>
