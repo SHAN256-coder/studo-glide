@@ -38,7 +38,7 @@ const StudentLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 glass-card border-b border-border/50 px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 glass-card border-b border-border/50 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <img src={collegeLogo} alt="College" className="h-8 rounded" />
           <div className="hidden sm:block">
