@@ -81,11 +81,11 @@ const LoginPage = () => {
         {/* Login Form */}
         <form onSubmit={handleLogin} className="glass-card p-6 space-y-5">
           <div className="space-y-2">
-            <Label className="text-card-foreground">Register Number</Label>
+            <Label className="text-card-foreground">Username</Label>
             <Input
-              value={registerNumber}
-              onChange={(e) => setRegisterNumber(e.target.value)}
-              placeholder="Enter your register number"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
               className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary"
             />
           </div>
