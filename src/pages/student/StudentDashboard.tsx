@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAppContext, ApplicationStatus, ApplicationType } from "@/contexts/AppContext";
-import { FileText, Clock, CheckCircle, XCircle, ArrowRight } from "lucide-react";
+import { useAppContext, ApplicationStatus } from "@/contexts/AppContext";
+import { FileText, Clock, CheckCircle, XCircle, ArrowRight, Home, GraduationCap, CalendarOff } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string; icon: typeof Clock }> = {
@@ -12,14 +12,12 @@ const statusConfig: Record<ApplicationStatus, { label: string; className: string
   rejected: { label: "Rejected", className: "status-rejected", icon: XCircle },
 };
 
-const typeLabels: Record<ApplicationType, string> = {
-  od: "On Duty",
-  leave: "Leave",
-  internship: "Internship",
-  "industrial-visit": "Industrial Visit",
-  "hostel-od": "Hostel OD",
-  "day-scholar-od": "Day Scholar OD",
-};
+const quickApply = [
+  { label: "OD – Hosteller", type: "od-hosteller", icon: Home },
+  { label: "OD – Day Scholar", type: "od-dayscholar", icon: GraduationCap },
+  { label: "Leave – Hosteller", type: "leave-hosteller", icon: CalendarOff },
+  { label: "Leave – Day Scholar", type: "leave-dayscholar", icon: CalendarOff },
+];
 
 const StudentDashboard = () => {
   const { user } = useAuth();
@@ -44,7 +42,7 @@ const StudentDashboard = () => {
     <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
-        <p className="text-xs sm:text-sm text-muted-foreground">Welcome back, {user?.name}</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Welcome back{user?.name ? `, ${user.name}` : ""}</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -64,20 +62,20 @@ const StudentDashboard = () => {
         ))}
       </div>
 
-      {/* Quick Apply */}
+      {/* Quick Apply - 4 cards */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-card-foreground">Quick Apply</h3>
-          <Link to="/dashboard/apply" className="text-primary text-sm flex items-center gap-1 hover:underline">
-            View all <ArrowRight size={14} />
+          <h3 className="text-base sm:text-lg font-semibold text-card-foreground">Quick Apply</h3>
+          <Link to="/dashboard/apply" className="text-primary text-xs sm:text-sm flex items-center gap-1 hover:underline">
+            All Forms <ArrowRight size={14} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-          {(["od", "leave", "hostel-od", "day-scholar-od"] as ApplicationType[]).map((type) => (
-            <Link key={type} to={`/dashboard/apply?type=${type}`}
-              className="glass-card-hover p-4 text-center">
-              <FileText className="mx-auto mb-2 text-primary" size={20} />
-              <p className="text-sm font-medium text-card-foreground">{typeLabels[type]}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          {quickApply.map((item) => (
+            <Link key={item.type} to={`/dashboard/apply?type=${item.type}`}
+              className="glass-card-hover p-3 sm:p-4 text-center">
+              <item.icon className="mx-auto mb-1.5 text-primary" size={20} />
+              <p className="text-xs sm:text-sm font-medium text-card-foreground leading-tight">{item.label}</p>
             </Link>
           ))}
         </div>
@@ -85,18 +83,17 @@ const StudentDashboard = () => {
 
       {/* Recent Applications */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-        <h3 className="text-lg font-semibold text-card-foreground mb-3">Recent Applications</h3>
-        <div className="space-y-3">
+        <h3 className="text-base sm:text-lg font-semibold text-card-foreground mb-3">Recent Applications</h3>
+        <div className="space-y-2 sm:space-y-3">
           {apps.slice(0, 5).map((app) => {
             const config = statusConfig[app.status];
             return (
-              <div key={app.id} className="glass-card p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-card-foreground">{typeLabels[app.type]}</p>
-                  <p className="text-xs text-muted-foreground">{app.fromDate} → {app.toDate}</p>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{app.reason}</p>
+              <div key={app.id} className="glass-card p-3 sm:p-4 flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-card-foreground truncate">{app.reason || app.type}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">{app.fromDate} → {app.toDate}</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.className}`}>
+                <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex-shrink-0 ${config.className}`}>
                   {config.label}
                 </span>
               </div>
