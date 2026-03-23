@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import collegeLogo from "@/assets/college-logo.png";
 
 const LoginPage = () => {
-  const [registerNumber, setRegisterNumber] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,12 +19,13 @@ const LoginPage = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(registerNumber, password, role)) {
-      toast.success("Login successful!");
-      navigate(role === "admin" ? "/admin" : "/dashboard");
-    } else {
-      toast.error("Invalid credentials. Please check your register number and password.");
+    if (!username.trim() || !password.trim()) {
+      toast.error("Please enter both username and password.");
+      return;
     }
+    login(username.trim(), password.trim(), role);
+    toast.success("Login successful!");
+    navigate(role === "admin" ? "/admin" : "/dashboard");
   };
 
   return (
