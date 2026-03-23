@@ -72,15 +72,21 @@ export const YEARS = [1, 2, 3, 4];
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (registerNumber: string, password: string, role: UserRole): boolean => {
-    const key = `${registerNumber}_${role}`;
-    const found = MOCK_USERS[key];
-    if (found && found.password === password) {
-      const { password: _, ...userData } = found;
-      setUser(userData);
-      return true;
-    }
-    return false;
+  const login = (username: string, _password: string, role: UserRole): boolean => {
+    setUser({
+      id: crypto.randomUUID(),
+      name: "",
+      registerNumber: "",
+      role,
+      department: "",
+      section: "",
+      semester: undefined as any,
+      year: undefined as any,
+      mobile: "",
+      cgpa: undefined as any,
+      college: "Dhaanish Ahmed College of Engineering",
+    });
+    return true;
   };
 
   const logout = () => setUser(null);
