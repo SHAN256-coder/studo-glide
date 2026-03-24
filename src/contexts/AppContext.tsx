@@ -6,7 +6,6 @@ export type ApplicationStatus = "pending" | "approved-l1" | "approved-l2" | "app
 
 export interface Application {
   id: string;
-  trackingId: string;
   studentId: string;
   studentName: string;
   registerNumber: string;
@@ -33,7 +32,7 @@ export interface Notification {
 
 interface AppContextType {
   applications: Application[];
-  addApplication: (app: Omit<Application, "id" | "trackingId" | "createdAt" | "status" | "approvalLevel">) => void;
+  addApplication: (app: Omit<Application, "id" | "createdAt" | "status" | "approvalLevel">) => void;
   updateStatus: (id: string, status: ApplicationStatus, comments?: string) => void;
   getStudentApplications: (studentId: string) => Application[];
   notifications: Notification[];
@@ -52,21 +51,11 @@ export const typeLabels: Record<ApplicationType, string> = {
 
 const statusLabels: Record<ApplicationStatus, string> = {
   pending: "Pending",
-  "approved-l1": "approved at Level 1",
-  "approved-l2": "approved at Level 2",
-  approved: "fully approved",
+  "approved-l1": "approved",
+  "approved-l2": "approved",
+  approved: "approved",
   rejected: "rejected",
 };
-
-function generateTrackingId(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const prefix = "TRK";
-  let result = prefix;
-  for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
 
 const AppContext = createContext<AppContextType | null>(null);
 
@@ -88,27 +77,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setNotifications((prev) => [newNotif, ...prev]);
 
+    // Show notification at top for 1 second
     if (type === "approval") {
-      toast.success(message, { duration: 5000 });
+      toast.success(message, { duration: 1000, position: "top-center" });
     } else if (type === "rejection") {
-      toast.error(message, { duration: 5000 });
+      toast.error(message, { duration: 1000, position: "top-center" });
     } else {
-      toast.info(message, { duration: 4000 });
+      toast.info(message, { duration: 1000, position: "top-center" });
     }
   }, []);
 
-  const addApplication = useCallback((app: Omit<Application, "id" | "trackingId" | "createdAt" | "status" | "approvalLevel">) => {
+  const addApplication = useCallback((app: Omit<Application, "id" | "createdAt" | "status" | "approvalLevel">) => {
     const newApp: Application = {
       ...app,
       id: `APP${String(Date.now()).slice(-5)}`,
-      trackingId: generateTrackingId(),
       status: "pending",
       createdAt: new Date().toISOString(),
       approvalLevel: 0,
     };
     setApplications((prev) => [newApp, ...prev]);
     addNotification(
-      `Your ${typeLabels[app.type]} application has been submitted. Tracking ID: ${newApp.trackingId}`,
+      `Your ${typeLabels[app.type]} application has been submitted.`,
       "info",
       newApp.id
     );
@@ -128,7 +117,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const statusText = statusLabels[status];
         const commentText = comments ? ` — "${comments}"` : "";
         const notifType: Notification["type"] = status === "rejected" ? "rejection" : status === "approved" ? "approval" : "info";
-        const message = `Your ${typeLabels[app.type]} application (${app.trackingId}) has been ${statusText}${commentText}`;
+        const message = `Your ${typeLabels[app.type]} application has been ${statusText}${commentText}`;
 
         setTimeout(() => addNotification(message, notifType, app.id), 0);
 
