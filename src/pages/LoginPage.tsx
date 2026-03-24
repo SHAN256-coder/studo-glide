@@ -14,6 +14,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -24,8 +25,8 @@ const LoginPage = () => {
       return;
     }
     login(username.trim(), password.trim(), role);
-    toast.success("Login successful!");
-    navigate(role === "admin" ? "/admin" : "/dashboard");
+    toast.success(mode === "signup" ? "Account created! Complete your profile." : "Login successful!");
+    navigate(role === "admin" ? "/admin" : (mode === "signup" ? "/dashboard/profile" : "/dashboard"));
   };
 
   return (
@@ -54,19 +55,37 @@ const LoginPage = () => {
         className="w-full max-w-md"
       >
         {/* Logo */}
-        <div className="text-center mb-8">
-          <img src={collegeLogo} alt="Dhaanish Ahmed College of Engineering" className="h-16 mx-auto mb-4 rounded" />
-          <h1 className="text-2xl font-display font-bold gold-gradient-text">Campus OD & Leave</h1>
-          <p className="text-muted-foreground text-sm mt-1">Management System</p>
+        <div className="text-center mb-6">
+          <img src={collegeLogo} alt="Dhaanish Connect" className="h-16 mx-auto mb-3 rounded" />
+          <h1 className="text-xl sm:text-2xl font-display font-bold gold-gradient-text">Smart Campus OD & Leave</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">Management System</p>
+          <p className="text-primary text-[10px] mt-0.5 font-medium">Dhaanish Connect</p>
+        </div>
+
+        {/* Sign In / Sign Up Toggle */}
+        <div className="flex gap-2 mb-4">
+          {(["signin", "signup"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all duration-300 ${
+                mode === m
+                  ? "bg-primary text-primary-foreground border-primary gold-glow"
+                  : "glass-card text-muted-foreground hover:text-card-foreground"
+              }`}
+            >
+              {m === "signin" ? "Sign In" : "Sign Up"}
+            </button>
+          ))}
         </div>
 
         {/* Role Toggle */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-5">
           {(["student", "admin"] as UserRole[]).map((r) => (
             <button
               key={r}
               onClick={() => setRole(r)}
-              className={`flex-1 py-3 rounded-lg border text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                 role === r
                   ? "bg-primary text-primary-foreground border-primary gold-glow"
                   : "glass-card text-muted-foreground hover:text-card-foreground"
@@ -79,19 +98,21 @@ const LoginPage = () => {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleLogin} className="glass-card p-6 space-y-5">
-          <div className="space-y-2">
-            <Label className="text-card-foreground">Username</Label>
+        <form onSubmit={handleLogin} className="glass-card p-5 space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-card-foreground text-sm">
+              {mode === "signup" ? "Mobile Number or Email" : "Username"}
+            </Label>
             <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              placeholder={mode === "signup" ? "Enter mobile or email" : "Enter your username"}
               className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-card-foreground">Password</Label>
+          <div className="space-y-1.5">
+            <Label className="text-card-foreground text-sm">Password</Label>
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
@@ -111,15 +132,17 @@ const LoginPage = () => {
           </div>
 
           <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold text-base py-5">
-            Sign In
+            {mode === "signup" ? "Create Account" : "Sign In"}
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Secure login for students and administrators
+            {mode === "signup"
+              ? "After sign up, you'll be asked to complete your profile"
+              : "Enter any username & password to login"}
           </p>
         </form>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-5">
           Powered by <span className="text-primary">Nano Spark</span>
         </p>
       </motion.div>

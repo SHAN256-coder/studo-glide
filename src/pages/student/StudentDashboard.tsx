@@ -1,28 +1,41 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext, ApplicationStatus } from "@/contexts/AppContext";
-import { FileText, Clock, CheckCircle, XCircle, ArrowRight, Home, GraduationCap, CalendarOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { FileText, Clock, CheckCircle, XCircle, CalendarDays, AlertTriangle, Zap, Calendar as CalendarIcon2 } from "lucide-react";
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string; icon: typeof Clock }> = {
   pending: { label: "Pending", className: "status-pending", icon: Clock },
-  "approved-l1": { label: "Level 1 Approved", className: "status-pending", icon: Clock },
-  "approved-l2": { label: "Level 2 Approved", className: "status-pending", icon: Clock },
+  "approved-l1": { label: "Pending", className: "status-pending", icon: Clock },
+  "approved-l2": { label: "Pending", className: "status-pending", icon: Clock },
   approved: { label: "Approved", className: "status-approved", icon: CheckCircle },
   rejected: { label: "Rejected", className: "status-rejected", icon: XCircle },
 };
-
-const quickApply = [
-  { label: "OD – Hosteller", type: "od-hosteller", icon: Home },
-  { label: "OD – Day Scholar", type: "od-dayscholar", icon: GraduationCap },
-  { label: "Leave – Hosteller", type: "leave-hosteller", icon: CalendarOff },
-  { label: "Leave – Day Scholar", type: "leave-dayscholar", icon: CalendarOff },
-];
 
 const StudentDashboard = () => {
   const { user } = useAuth();
   const { getStudentApplications } = useAppContext();
   const apps = getStudentApplications(user?.id || "");
+
+  // Calculate monthly stats
+  const now = new Date();
+  const thisMonth = apps.filter((a) => {
+    const d = new Date(a.createdAt);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  const holidaysTaken = thisMonth.filter((a) => a.type === "leave" && a.status === "approved").length;
+  const absentsThisMonth = thisMonth.filter((a) => ["leave"].includes(a.type) && a.reason?.toLowerCase().includes("absent")).length
+    + thisMonth.filter((a) => a.type === "leave" && a.status !== "approved").length;
+  const siphODThisMonth = thisMonth.filter((a) => a.reason?.toLowerCase().includes("siph")).length;
+  const eventsODThisMonth = thisMonth.filter((a) => (a.type === "od" || a.type === "day-scholar-od" || a.type === "hostel-od") && a.status === "approved").length;
+
+  const dashCards = [
+    { label: "Holidays This Month", value: holidaysTaken, icon: CalendarDays, color: "text-primary" },
+    { label: "Absents This Month", value: absentsThisMonth, icon: AlertTriangle, color: "text-destructive" },
+    { label: "SIPH OD This Month", value: siphODThisMonth, icon: Zap, color: "text-warning" },
+    { label: "Events OD This Month", value: eventsODThisMonth, icon: CalendarIcon2, color: "text-success" },
+  ];
 
   const stats = {
     total: apps.length,
@@ -45,41 +58,39 @@ const StudentDashboard = () => {
         <p className="text-xs sm:text-sm text-muted-foreground">Welcome back{user?.name ? `, ${user.name}` : ""}</p>
       </motion.div>
 
-      {/* Stats Grid */}
+      {/* Monthly Stats */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
-        {statCards.map((stat, i) => (
+        {dashCards.map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: i * 0.08 }}
             className="glass-card-hover p-3 sm:p-4 text-center"
           >
             <stat.icon className={`mx-auto mb-1.5 sm:mb-2 ${stat.color}`} size={20} />
             <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stat.value}</p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{stat.label}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* Quick Apply - 4 cards */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base sm:text-lg font-semibold text-card-foreground">Quick Apply</h3>
-          <Link to="/dashboard/apply" className="text-primary text-xs sm:text-sm flex items-center gap-1 hover:underline">
-            All Forms <ArrowRight size={14} />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-          {quickApply.map((item) => (
-            <Link key={item.type} to={`/dashboard/apply?type=${item.type}`}
-              className="glass-card-hover p-3 sm:p-4 text-center">
-              <item.icon className="mx-auto mb-1.5 text-primary" size={20} />
-              <p className="text-xs sm:text-sm font-medium text-card-foreground leading-tight">{item.label}</p>
-            </Link>
-          ))}
-        </div>
-      </motion.div>
+      {/* Overall Stats */}
+      <div className="grid grid-cols-4 gap-2">
+        {statCards.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.05 }}
+            className="glass-card p-2.5 sm:p-3 text-center"
+          >
+            <stat.icon className={`mx-auto mb-1 ${stat.color}`} size={16} />
+            <p className="text-lg font-bold text-card-foreground">{stat.value}</p>
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
 
       {/* Recent Applications */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
