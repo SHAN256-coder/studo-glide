@@ -14,16 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          comments: string | null
+          created_at: string
+          department: string | null
+          from_date: string | null
+          id: string
+          is_draft: boolean | null
+          reason: string | null
+          register_number: string | null
+          status: Database["public"]["Enums"]["application_status"]
+          student_id: string
+          student_name: string | null
+          to_date: string | null
+          type: Database["public"]["Enums"]["application_type"]
+          updated_at: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          department?: string | null
+          from_date?: string | null
+          id?: string
+          is_draft?: boolean | null
+          reason?: string | null
+          register_number?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          student_id: string
+          student_name?: string | null
+          to_date?: string | null
+          type: Database["public"]["Enums"]["application_type"]
+          updated_at?: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          department?: string | null
+          from_date?: string | null
+          id?: string
+          is_draft?: boolean | null
+          reason?: string | null
+          register_number?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          student_id?: string
+          student_name?: string | null
+          to_date?: string | null
+          type?: Database["public"]["Enums"]["application_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          application_id: string | null
+          created_at: string
+          id: string
+          message: string
+          read: boolean | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          application_id?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean | null
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          application_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          cgpa: number | null
+          class_coordinator_name: string | null
+          college: string | null
+          created_at: string
+          department: string | null
+          github_id: string | null
+          id: string
+          linkedin_id: string | null
+          mobile: string | null
+          name: string | null
+          portfolio_link: string | null
+          profile_completed: boolean | null
+          profile_picture: string | null
+          register_number: string | null
+          resume_link: string | null
+          section: string | null
+          semester: number | null
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          cgpa?: number | null
+          class_coordinator_name?: string | null
+          college?: string | null
+          created_at?: string
+          department?: string | null
+          github_id?: string | null
+          id: string
+          linkedin_id?: string | null
+          mobile?: string | null
+          name?: string | null
+          portfolio_link?: string | null
+          profile_completed?: boolean | null
+          profile_picture?: string | null
+          register_number?: string | null
+          resume_link?: string | null
+          section?: string | null
+          semester?: number | null
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          cgpa?: number | null
+          class_coordinator_name?: string | null
+          college?: string | null
+          created_at?: string
+          department?: string | null
+          github_id?: string | null
+          id?: string
+          linkedin_id?: string | null
+          mobile?: string | null
+          name?: string | null
+          portfolio_link?: string | null
+          profile_completed?: boolean | null
+          profile_picture?: string | null
+          register_number?: string | null
+          resume_link?: string | null
+          section?: string | null
+          semester?: number | null
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      application_status: "pending" | "approved" | "rejected"
+      application_type:
+        | "od"
+        | "leave"
+        | "internship"
+        | "industrial-visit"
+        | "hostel-od"
+        | "day-scholar-od"
+        | "siph-od"
+      notification_type: "approval" | "rejection" | "info"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +353,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      application_status: ["pending", "approved", "rejected"],
+      application_type: [
+        "od",
+        "leave",
+        "internship",
+        "industrial-visit",
+        "hostel-od",
+        "day-scholar-od",
+        "siph-od",
+      ],
+      notification_type: ["approval", "rejection", "info"],
+    },
   },
 } as const
