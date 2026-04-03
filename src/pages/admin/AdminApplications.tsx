@@ -10,12 +10,11 @@ import { Check, X, Filter } from "lucide-react";
 const typeLabels: Record<ApplicationType, string> = {
   od: "On Duty", leave: "Leave", internship: "Internship",
   "industrial-visit": "Industrial Visit", "hostel-od": "Hostel OD",
-  "day-scholar-od": "Day Scholar OD",
+  "day-scholar-od": "Day Scholar OD", "siph-od": "SIPH OD",
 };
 
 const statusLabels: Record<ApplicationStatus, string> = {
-  pending: "Pending", "approved-l1": "L1 Approved", "approved-l2": "L2 Approved",
-  approved: "Fully Approved", rejected: "Rejected",
+  pending: "Pending", approved: "Approved", rejected: "Rejected",
 };
 
 const AdminApplications = () => {
@@ -30,13 +29,9 @@ const AdminApplications = () => {
     return true;
   });
 
-  const handleApprove = (id: string, currentStatus: ApplicationStatus) => {
-    const next: ApplicationStatus =
-      currentStatus === "pending" ? "approved-l1" :
-      currentStatus === "approved-l1" ? "approved-l2" :
-      "approved";
-    updateStatus(id, next, commentMap[id]);
-    toast.success(`Application ${next === "approved" ? "fully approved" : "forwarded to next level"}`);
+  const handleApprove = (id: string) => {
+    updateStatus(id, "approved", commentMap[id]);
+    toast.success("Application approved");
   };
 
   const handleReject = (id: string) => {
@@ -49,74 +44,45 @@ const AdminApplications = () => {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-xl font-display font-bold gold-gradient-text">Applications</h2>
       </motion.div>
-
-      {/* Filters */}
       <div className="flex flex-wrap gap-3 items-center">
         <Filter size={16} className="text-muted-foreground" />
         <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-40 bg-input border-border text-card-foreground">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
+          <SelectTrigger className="w-40 bg-input border-border text-card-foreground"><SelectValue placeholder="Type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            {Object.entries(typeLabels).map(([k, v]) => (
-              <SelectItem key={k} value={k}>{v}</SelectItem>
-            ))}
+            {Object.entries(typeLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-40 bg-input border-border text-card-foreground">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
+          <SelectTrigger className="w-40 bg-input border-border text-card-foreground"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            {Object.entries(statusLabels).map(([k, v]) => (
-              <SelectItem key={k} value={k}>{v}</SelectItem>
-            ))}
+            {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
-
-      {/* Application List */}
       <div className="space-y-4">
         {filtered.map((app, i) => (
-          <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className="glass-card p-5 space-y-3">
+          <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-5 space-y-3">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-base font-semibold text-card-foreground">{app.studentName}</p>
                 <p className="text-xs text-muted-foreground">{app.registerNumber} • {app.department}</p>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                app.status === "approved" ? "status-approved" : app.status === "rejected" ? "status-rejected" : "status-pending"
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${app.status === "approved" ? "status-approved" : app.status === "rejected" ? "status-rejected" : "status-pending"}`}>
                 {statusLabels[app.status]}
               </span>
             </div>
-
             <div className="text-sm text-card-foreground">
               <span className="text-primary font-medium">{typeLabels[app.type]}</span> • {app.fromDate} → {app.toDate}
             </div>
             <p className="text-sm text-muted-foreground">{app.reason}</p>
-
-            {!["approved", "rejected"].includes(app.status) && (
+            {app.status === "pending" && (
               <div className="space-y-2 pt-2 border-t border-border">
-                <Textarea
-                  placeholder="Add comments (optional)"
-                  value={commentMap[app.id] || ""}
-                  onChange={(e) => setCommentMap((prev) => ({ ...prev, [app.id]: e.target.value }))}
-                  rows={2}
-                  className="bg-input border-border text-card-foreground placeholder:text-muted-foreground text-sm"
-                />
+                <Textarea placeholder="Add comments (optional)" value={commentMap[app.id] || ""} onChange={(e) => setCommentMap((prev) => ({ ...prev, [app.id]: e.target.value }))} rows={2} className="bg-input border-border text-card-foreground placeholder:text-muted-foreground text-sm" />
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleApprove(app.id, app.status)}
-                    className="bg-success text-success-foreground hover:bg-success/90 flex items-center gap-1">
-                    <Check size={14} /> {app.status === "approved-l2" ? "Final Approve" : "Approve / Forward"}
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleReject(app.id)}
-                    className="flex items-center gap-1">
-                    <X size={14} /> Reject
-                  </Button>
+                  <Button size="sm" onClick={() => handleApprove(app.id)} className="bg-success text-success-foreground hover:bg-success/90 flex items-center gap-1"><Check size={14} /> Approve</Button>
+                  <Button size="sm" variant="destructive" onClick={() => handleReject(app.id)} className="flex items-center gap-1"><X size={14} /> Reject</Button>
                 </div>
               </div>
             )}

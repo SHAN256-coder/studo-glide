@@ -6,8 +6,6 @@ import { FileText, Clock, CheckCircle, XCircle, CalendarDays, AlertTriangle, Zap
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string; icon: typeof Clock }> = {
   pending: { label: "Pending", className: "status-pending", icon: Clock },
-  "approved-l1": { label: "Pending", className: "status-pending", icon: Clock },
-  "approved-l2": { label: "Pending", className: "status-pending", icon: Clock },
   approved: { label: "Approved", className: "status-approved", icon: CheckCircle },
   rejected: { label: "Rejected", className: "status-rejected", icon: XCircle },
 };
@@ -17,7 +15,6 @@ const StudentDashboard = () => {
   const { getStudentApplications } = useAppContext();
   const apps = getStudentApplications(user?.id || "");
 
-  // Calculate monthly stats
   const now = new Date();
   const thisMonth = apps.filter((a) => {
     const d = new Date(a.createdAt);
@@ -25,10 +22,9 @@ const StudentDashboard = () => {
   });
 
   const holidaysTaken = thisMonth.filter((a) => a.type === "leave" && a.status === "approved").length;
-  const absentsThisMonth = thisMonth.filter((a) => ["leave"].includes(a.type) && a.reason?.toLowerCase().includes("absent")).length
-    + thisMonth.filter((a) => a.type === "leave" && a.status !== "approved").length;
-  const siphODThisMonth = thisMonth.filter((a) => a.reason?.toLowerCase().includes("siph")).length;
-  const eventsODThisMonth = thisMonth.filter((a) => (a.type === "od" || a.type === "day-scholar-od" || a.type === "hostel-od") && a.status === "approved").length;
+  const absentsThisMonth = thisMonth.filter((a) => a.type === "leave" && a.status !== "approved").length;
+  const siphODThisMonth = thisMonth.filter((a) => a.type === "siph-od").length;
+  const eventsODThisMonth = thisMonth.filter((a) => ["od", "day-scholar-od", "hostel-od"].includes(a.type) && a.status === "approved").length;
 
   const dashCards = [
     { label: "Holidays This Month", value: holidaysTaken, icon: CalendarDays, color: "text-primary" },
@@ -39,7 +35,7 @@ const StudentDashboard = () => {
 
   const stats = {
     total: apps.length,
-    pending: apps.filter((a) => ["pending", "approved-l1", "approved-l2"].includes(a.status)).length,
+    pending: apps.filter((a) => a.status === "pending").length,
     approved: apps.filter((a) => a.status === "approved").length,
     rejected: apps.filter((a) => a.status === "rejected").length,
   };
@@ -57,42 +53,24 @@ const StudentDashboard = () => {
         <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
         <p className="text-xs sm:text-sm text-muted-foreground">Welcome back{user?.name ? `, ${user.name}` : ""}</p>
       </motion.div>
-
-      {/* Monthly Stats */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
         {dashCards.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
-            className="glass-card-hover p-3 sm:p-4 text-center"
-          >
+          <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card-hover p-3 sm:p-4 text-center">
             <stat.icon className={`mx-auto mb-1.5 sm:mb-2 ${stat.color}`} size={20} />
             <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stat.value}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{stat.label}</p>
           </motion.div>
         ))}
       </div>
-
-      {/* Overall Stats */}
       <div className="grid grid-cols-4 gap-2">
         {statCards.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.05 }}
-            className="glass-card p-2.5 sm:p-3 text-center"
-          >
+          <motion.div key={stat.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.05 }} className="glass-card p-2.5 sm:p-3 text-center">
             <stat.icon className={`mx-auto mb-1 ${stat.color}`} size={16} />
             <p className="text-lg font-bold text-card-foreground">{stat.value}</p>
             <p className="text-[9px] sm:text-[10px] text-muted-foreground">{stat.label}</p>
           </motion.div>
         ))}
       </div>
-
-      {/* Recent Applications */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
         <h3 className="text-base sm:text-lg font-semibold text-card-foreground mb-3">Recent Applications</h3>
         <div className="space-y-2 sm:space-y-3">
@@ -104,15 +82,11 @@ const StudentDashboard = () => {
                   <p className="text-xs sm:text-sm font-medium text-card-foreground truncate">{app.reason || app.type}</p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground">{app.fromDate} → {app.toDate}</p>
                 </div>
-                <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex-shrink-0 ${config.className}`}>
-                  {config.label}
-                </span>
+                <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex-shrink-0 ${config.className}`}>{config.label}</span>
               </div>
             );
           })}
-          {apps.length === 0 && (
-            <p className="text-center text-muted-foreground text-sm py-8">No applications yet. Start by applying!</p>
-          )}
+          {apps.length === 0 && <p className="text-center text-muted-foreground text-sm py-8">No applications yet. Start by applying!</p>}
         </div>
       </motion.div>
     </div>
