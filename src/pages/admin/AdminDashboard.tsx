@@ -7,7 +7,7 @@ const AdminDashboard = () => {
 
   const stats = {
     total: applications.length,
-    pending: applications.filter(a => ["pending", "approved-l1", "approved-l2"].includes(a.status)).length,
+    pending: applications.filter(a => a.status === "pending").length,
     approved: applications.filter(a => a.status === "approved").length,
     rejected: applications.filter(a => a.status === "rejected").length,
   };
