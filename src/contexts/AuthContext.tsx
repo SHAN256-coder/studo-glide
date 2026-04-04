@@ -22,6 +22,16 @@ export interface Profile {
   resumeLink: string | null;
   portfolioLink: string | null;
   profileCompleted: boolean;
+  fatherName: string | null;
+  motherName: string | null;
+  dob: string | null;
+  bloodGroup: string | null;
+  address: string | null;
+  parentMobile: string | null;
+  studentType: string | null;
+  roomNumber: string | null;
+  busNumber: string | null;
+  boardingPoint: string | null;
 }
 
 // Keep backward compat alias
