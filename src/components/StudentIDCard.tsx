@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { RotateCw, X } from "lucide-react";
+import { RotateCw, X, Download, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { QRCodeSVG } from "qrcode.react";
 import collegeLogo from "@/assets/college-logo.png";
 import Barcode from "@/components/Barcode";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
@@ -15,12 +17,86 @@ interface Props {
 const StudentIDCard = ({ open, onClose }: Props) => {
   const { user } = useAuth();
   const [flipped, setFlipped] = useState(false);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
 
   if (!open || !user) return null;
 
   const isHosteller = user.studentType === "hosteller";
   const barcodeData = `${user.name || ""}|${user.registerNumber || ""}|${user.mobile || ""}`;
   const batch = user.year ? `${2025 - (user.year - 1)} - ${2025 - (user.year - 1) + 4}` : "";
+
+  const captureCard = async (side: "front" | "back") => {
+    const ref = side === "front" ? frontRef.current : backRef.current;
+    if (!ref) return null;
+    // Temporarily make back side visible for capture
+    const origTransform = ref.style.transform;
+    const origPosition = ref.style.position;
+    ref.style.transform = "none";
+    ref.style.position = "relative";
+    const canvas = await html2canvas(ref, { scale: 3, useCORS: true, backgroundColor: "#ffffff" });
+    ref.style.transform = origTransform;
+    ref.style.position = origPosition;
+    return canvas;
+  };
+
+  const handleDownloadPDF = async () => {
+    toast.loading("Generating PDF...");
+    try {
+      const frontCanvas = await captureCard("front");
+      const backCanvas = await captureCard("back");
+      if (!frontCanvas || !backCanvas) throw new Error("Capture failed");
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: [86, 54] });
+      // Credit card size ~86x54mm
+      const w = 86, h = 54;
+
+      // Front
+      const frontImg = frontCanvas.toDataURL("image/png");
+      pdf.addImage(frontImg, "PNG", 0, 0, w, h);
+
+      // Back
+      pdf.addPage([86, 54]);
+      const backImg = backCanvas.toDataURL("image/png");
+      pdf.addImage(backImg, "PNG", 0, 0, w, h);
+
+      pdf.save(`ID_Card_${user.registerNumber || "student"}.pdf`);
+      toast.dismiss();
+      toast.success("PDF downloaded!");
+    } catch {
+      toast.dismiss();
+      toast.error("Failed to generate PDF");
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    toast.loading("Generating images...");
+    try {
+      const frontCanvas = await captureCard("front");
+      const backCanvas = await captureCard("back");
+      if (!frontCanvas || !backCanvas) throw new Error("Capture failed");
+
+      // Download front
+      const linkF = document.createElement("a");
+      linkF.download = `ID_Card_Front_${user.registerNumber || "student"}.png`;
+      linkF.href = frontCanvas.toDataURL("image/png");
+      linkF.click();
+
+      // Download back
+      setTimeout(() => {
+        const linkB = document.createElement("a");
+        linkB.download = `ID_Card_Back_${user.registerNumber || "student"}.png`;
+        linkB.href = backCanvas.toDataURL("image/png");
+        linkB.click();
+      }, 500);
+
+      toast.dismiss();
+      toast.success("Images downloaded!");
+    } catch {
+      toast.dismiss();
+      toast.error("Failed to generate images");
+    }
+  };
 
   return (
     <motion.div
@@ -38,7 +114,6 @@ const StudentIDCard = ({ open, onClose }: Props) => {
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-[340px]"
       >
-        {/* Close button */}
         <Button
           size="icon"
           variant="ghost"
@@ -48,7 +123,6 @@ const StudentIDCard = ({ open, onClose }: Props) => {
           <X size={20} />
         </Button>
 
-        {/* Card container with perspective */}
         <div className="relative" style={{ perspective: "1000px" }}>
           <motion.div
             animate={{ rotateY: flipped ? 180 : 0 }}
@@ -58,11 +132,11 @@ const StudentIDCard = ({ open, onClose }: Props) => {
           >
             {/* Front Side */}
             <div
+              ref={frontRef}
               className="w-full rounded-2xl overflow-hidden shadow-2xl"
               style={{ backfaceVisibility: "hidden" }}
             >
               <div className="bg-white text-black">
-                {/* College Header */}
                 <div className="bg-[#003399] text-white p-3 flex items-start gap-2">
                   <img src={collegeLogo} alt="College" className="h-12 w-12 object-contain rounded" />
                   <div className="flex-1 min-w-0">
@@ -72,7 +146,6 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                   </div>
                 </div>
 
-                {/* Photo + H/D indicator */}
                 <div className="relative px-6 pt-4 pb-2 flex items-center justify-center">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-4xl font-black text-[#003399]">
                     {isHosteller ? "H" : "D"}
@@ -91,7 +164,6 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                   </span>
                 </div>
 
-                {/* Student Info */}
                 <div className="px-4 pb-3 space-y-1 text-center">
                   <p className="text-base font-bold uppercase">{user.name || "—"}</p>
                   <div className="text-left space-y-0.5 text-sm">
@@ -101,12 +173,10 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                   </div>
                 </div>
 
-                {/* Barcode */}
                 <div className="px-6 pb-2 flex justify-center">
                   <Barcode value={barcodeData} />
                 </div>
 
-                {/* Chairman */}
                 <div className="text-right px-4 pb-3">
                   <p className="text-xs font-semibold">Chairman</p>
                 </div>
@@ -115,6 +185,7 @@ const StudentIDCard = ({ open, onClose }: Props) => {
 
             {/* Back Side */}
             <div
+              ref={backRef}
               className="w-full rounded-2xl overflow-hidden shadow-2xl absolute top-0 left-0"
               style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
             >
@@ -137,10 +208,8 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                   <p className="text-sm font-bold">Room Number : <span className="font-normal">{user.roomNumber || "—"}</span></p>
                 )}
 
-                {/* Dashed separator */}
                 <div className="border-t-4 border-dashed border-[#003399] my-3" />
 
-                {/* Footer */}
                 <div className="flex items-start gap-2 pt-1">
                   <img src={collegeLogo} alt="College" className="h-8 w-8 object-contain rounded" />
                   <div className="text-[8px] text-center flex-1 leading-tight">
@@ -156,14 +225,30 @@ const StudentIDCard = ({ open, onClose }: Props) => {
           </motion.div>
         </div>
 
-        {/* Rotate Button */}
-        <motion.div className="flex justify-center mt-4">
+        {/* Action Buttons */}
+        <motion.div className="flex justify-center gap-2 mt-4 flex-wrap">
           <Button
             onClick={() => setFlipped(!flipped)}
             className="gap-2 bg-primary text-primary-foreground"
           >
             <RotateCw size={16} />
             {flipped ? "Show Front" : "Show Back"}
+          </Button>
+          <Button
+            onClick={handleDownloadPDF}
+            variant="outline"
+            className="gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            <Download size={16} />
+            PDF
+          </Button>
+          <Button
+            onClick={handleDownloadImage}
+            variant="outline"
+            className="gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            <FileImage size={16} />
+            Image
           </Button>
         </motion.div>
       </motion.div>
