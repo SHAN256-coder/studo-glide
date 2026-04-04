@@ -164,7 +164,7 @@ const ProfileSetupPage = () => {
                 {field.label}
                 <span className="text-destructive text-xs">*</span>
               </Label>
-              {field.type === "select" ? (
+              {'options' in field && field.type === "select" ? (
                 <Select value={(form as any)[field.key]?.toString() || ""} onValueChange={(v) => set(field.key, v)}>
                   <SelectTrigger className="h-9 text-sm"><SelectValue placeholder={`Select ${field.label.toLowerCase()}`} /></SelectTrigger>
                   <SelectContent>
