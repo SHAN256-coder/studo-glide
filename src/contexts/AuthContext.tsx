@@ -78,6 +78,16 @@ function mapProfile(row: any): Profile {
     resumeLink: row.resume_link,
     portfolioLink: row.portfolio_link,
     profileCompleted: row.profile_completed ?? false,
+    fatherName: row.father_name,
+    motherName: row.mother_name,
+    dob: row.dob,
+    bloodGroup: row.blood_group,
+    address: row.address,
+    parentMobile: row.parent_mobile,
+    studentType: row.student_type,
+    roomNumber: row.room_number,
+    busNumber: row.bus_number,
+    boardingPoint: row.boarding_point,
   };
 }
 
