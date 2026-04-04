@@ -15,6 +15,7 @@ const statusConfig: Record<ApplicationStatus, { label: string; className: string
 const StudentDashboard = () => {
   const { user } = useAuth();
   const { getStudentApplications } = useAppContext();
+  const [showID, setShowID] = useState(false);
   const apps = getStudentApplications(user?.id || "");
 
   const now = new Date();
