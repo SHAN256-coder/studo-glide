@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar, Users } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Camera, User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar, Users, Heart, MapPin, Bus, Home, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import collegeLogo from "@/assets/college-logo.png";
+
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const ProfileSetupPage = () => {
   const { updateProfile } = useAuth();
@@ -26,6 +29,16 @@ const ProfileSetupPage = () => {
     semester: "",
     cgpa: "",
     classCoordinatorName: "",
+    fatherName: "",
+    motherName: "",
+    dob: "",
+    bloodGroup: "",
+    address: "",
+    parentMobile: "",
+    studentType: "",
+    roomNumber: "",
+    busNumber: "",
+    boardingPoint: "",
   });
 
   const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
@@ -40,9 +53,28 @@ const ProfileSetupPage = () => {
     { key: "semester", label: "Semester", icon: Calendar, type: "select", options: SEMESTERS },
     { key: "cgpa", label: "CGPA", icon: Award, type: "number", placeholder: "e.g. 8.5" },
     { key: "classCoordinatorName", label: "Class Coordinator Name", icon: Users, type: "text", placeholder: "Enter coordinator's name" },
+    { key: "fatherName", label: "Father's Name", icon: UserCheck, type: "text", placeholder: "Enter father's name" },
+    { key: "motherName", label: "Mother's Name", icon: UserCheck, type: "text", placeholder: "Enter mother's name" },
+    { key: "dob", label: "Date of Birth", icon: Calendar, type: "date", placeholder: "" },
+    { key: "bloodGroup", label: "Blood Group", icon: Heart, type: "select", options: BLOOD_GROUPS },
+    { key: "parentMobile", label: "Parent/Guardian Mobile", icon: Phone, type: "tel", placeholder: "+91 9876543210" },
+    { key: "studentType", label: "Hosteller / Day Scholar", icon: Home, type: "select", options: ["hosteller", "day_scholar"] },
+    { key: "address", label: "Residential Address", icon: MapPin, type: "textarea", placeholder: "Enter your full address" },
   ];
 
-  const allFilled = mandatoryFields.every((f) => (form as any)[f.key]?.toString().trim());
+  const conditionalFields = form.studentType === "hosteller"
+    ? [{ key: "roomNumber", label: "Hostel Room Number", icon: Home, type: "text", placeholder: "e.g. A-101" }]
+    : form.studentType === "day_scholar"
+    ? [
+        { key: "busNumber", label: "Bus Number", icon: Bus, type: "text", placeholder: "e.g. 5A" },
+        { key: "boardingPoint", label: "Boarding Point", icon: MapPin, type: "text", placeholder: "e.g. Tambaram" },
+      ]
+    : [];
+
+  const allFields = [...mandatoryFields, ...conditionalFields];
+
+  const allFilled = mandatoryFields.every((f) => (form as any)[f.key]?.toString().trim()) &&
+    conditionalFields.every((f) => (form as any)[f.key]?.toString().trim());
 
   const handlePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,6 +102,16 @@ const ProfileSetupPage = () => {
         semester: Number(form.semester),
         cgpa: Number(form.cgpa),
         classCoordinatorName: form.classCoordinatorName,
+        fatherName: form.fatherName,
+        motherName: form.motherName,
+        dob: form.dob,
+        bloodGroup: form.bloodGroup,
+        address: form.address,
+        parentMobile: form.parentMobile,
+        studentType: form.studentType,
+        roomNumber: form.roomNumber || null,
+        busNumber: form.busNumber || null,
+        boardingPoint: form.boardingPoint || null,
         profilePicture: profilePic,
         profileCompleted: true,
       });
@@ -85,14 +127,12 @@ const ProfileSetupPage = () => {
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6 pb-24">
       <div className="max-w-lg mx-auto space-y-5">
-        {/* Header */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <img src={collegeLogo} alt="College" className="h-12 mx-auto mb-2 rounded" />
           <h1 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Complete Your Profile</h1>
           <p className="text-xs text-muted-foreground mt-1">All fields marked with <span className="text-destructive">*</span> are mandatory</p>
         </motion.div>
 
-        {/* Profile Picture */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 text-center">
           <div className="relative w-20 h-20 mx-auto mb-2">
             {profilePic ? (
@@ -107,17 +147,16 @@ const ProfileSetupPage = () => {
               <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
             </label>
           </div>
-          <p className="text-xs text-muted-foreground">Profile picture (optional)</p>
+          <p className="text-xs text-muted-foreground">Profile picture (used for ID card)</p>
         </motion.div>
 
-        {/* Fields */}
         <div className="space-y-3">
-          {mandatoryFields.map((field, i) => (
+          {allFields.map((field, i) => (
             <motion.div
               key={field.key}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
+              transition={{ delay: i * 0.03 }}
               className="glass-card p-3"
             >
               <Label className="text-card-foreground text-sm flex items-center gap-1.5 mb-1.5">
@@ -125,15 +164,25 @@ const ProfileSetupPage = () => {
                 {field.label}
                 <span className="text-destructive text-xs">*</span>
               </Label>
-              {field.type === "select" ? (
+              {'options' in field && field.type === "select" ? (
                 <Select value={(form as any)[field.key]?.toString() || ""} onValueChange={(v) => set(field.key, v)}>
                   <SelectTrigger className="h-9 text-sm"><SelectValue placeholder={`Select ${field.label.toLowerCase()}`} /></SelectTrigger>
                   <SelectContent>
-                    {field.options?.map((opt) => (
-                      <SelectItem key={String(opt)} value={String(opt)}>{String(opt)}</SelectItem>
+                    {field.options?.map((opt: any) => (
+                      <SelectItem key={String(opt)} value={String(opt)}>
+                        {String(opt) === "hosteller" ? "Hosteller" : String(opt) === "day_scholar" ? "Day Scholar" : String(opt)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              ) : field.type === "textarea" ? (
+                <Textarea
+                  value={(form as any)[field.key]}
+                  onChange={(e) => set(field.key, e.target.value)}
+                  placeholder={field.placeholder}
+                  className="text-sm"
+                  rows={3}
+                />
               ) : (
                 <Input
                   type={field.type}
@@ -147,7 +196,6 @@ const ProfileSetupPage = () => {
           ))}
         </div>
 
-        {/* Submit */}
         <Button
           onClick={handleSubmit}
           disabled={!allFilled || isLoading}

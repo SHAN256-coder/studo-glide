@@ -120,65 +120,95 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          blood_group: string | null
+          boarding_point: string | null
+          bus_number: string | null
           cgpa: number | null
           class_coordinator_name: string | null
           college: string | null
           created_at: string
           department: string | null
+          dob: string | null
+          father_name: string | null
           github_id: string | null
           id: string
           linkedin_id: string | null
           mobile: string | null
+          mother_name: string | null
           name: string | null
+          parent_mobile: string | null
           portfolio_link: string | null
           profile_completed: boolean | null
           profile_picture: string | null
           register_number: string | null
           resume_link: string | null
+          room_number: string | null
           section: string | null
           semester: number | null
+          student_type: string | null
           updated_at: string
           year: number | null
         }
         Insert: {
+          address?: string | null
+          blood_group?: string | null
+          boarding_point?: string | null
+          bus_number?: string | null
           cgpa?: number | null
           class_coordinator_name?: string | null
           college?: string | null
           created_at?: string
           department?: string | null
+          dob?: string | null
+          father_name?: string | null
           github_id?: string | null
           id: string
           linkedin_id?: string | null
           mobile?: string | null
+          mother_name?: string | null
           name?: string | null
+          parent_mobile?: string | null
           portfolio_link?: string | null
           profile_completed?: boolean | null
           profile_picture?: string | null
           register_number?: string | null
           resume_link?: string | null
+          room_number?: string | null
           section?: string | null
           semester?: number | null
+          student_type?: string | null
           updated_at?: string
           year?: number | null
         }
         Update: {
+          address?: string | null
+          blood_group?: string | null
+          boarding_point?: string | null
+          bus_number?: string | null
           cgpa?: number | null
           class_coordinator_name?: string | null
           college?: string | null
           created_at?: string
           department?: string | null
+          dob?: string | null
+          father_name?: string | null
           github_id?: string | null
           id?: string
           linkedin_id?: string | null
           mobile?: string | null
+          mother_name?: string | null
           name?: string | null
+          parent_mobile?: string | null
           portfolio_link?: string | null
           profile_completed?: boolean | null
           profile_picture?: string | null
           register_number?: string | null
           resume_link?: string | null
+          room_number?: string | null
           section?: string | null
           semester?: number | null
+          student_type?: string | null
           updated_at?: string
           year?: number | null
         }

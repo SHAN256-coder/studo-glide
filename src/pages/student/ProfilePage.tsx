@@ -4,7 +4,8 @@ import { useAuth, DEPARTMENTS, SEMESTERS, YEARS } from "@/contexts/AuthContext";
 import { useAppContext } from "@/contexts/AppContext";
 import {
   User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar,
-  Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX
+  Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX,
+  Heart, MapPin, Bus, Home, UserCheck
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,6 +47,8 @@ const ProfilePage = () => {
     }
   };
 
+  const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
   const fields = [
     { label: "Name", key: "name", icon: User, editable: true, type: "text" },
     { label: "Register Number", key: "registerNumber", icon: GraduationCap, editable: false },
@@ -56,6 +59,16 @@ const ProfilePage = () => {
     { label: "Semester", key: "semester", icon: Calendar, editable: true, type: "select", options: SEMESTERS },
     { label: "CGPA", key: "cgpa", icon: Award, editable: true, type: "number" },
     { label: "College", key: "college", icon: Building2, editable: true, type: "text" },
+    { label: "Father's Name", key: "fatherName", icon: UserCheck, editable: true, type: "text" },
+    { label: "Mother's Name", key: "motherName", icon: UserCheck, editable: true, type: "text" },
+    { label: "Date of Birth", key: "dob", icon: Calendar, editable: true, type: "date" },
+    { label: "Blood Group", key: "bloodGroup", icon: Heart, editable: true, type: "select", options: BLOOD_GROUPS },
+    { label: "Parent/Guardian Mobile", key: "parentMobile", icon: Phone, editable: true, type: "tel" },
+    { label: "Student Type", key: "studentType", icon: Home, editable: true, type: "select", options: ["hosteller", "day_scholar"] },
+    { label: "Address", key: "address", icon: MapPin, editable: true, type: "text" },
+    { label: "Room Number", key: "roomNumber", icon: Home, editable: true, type: "text" },
+    { label: "Bus Number", key: "busNumber", icon: Bus, editable: true, type: "text" },
+    { label: "Boarding Point", key: "boardingPoint", icon: MapPin, editable: true, type: "text" },
   ];
 
   const socialFields = [

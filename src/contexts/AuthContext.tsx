@@ -22,6 +22,16 @@ export interface Profile {
   resumeLink: string | null;
   portfolioLink: string | null;
   profileCompleted: boolean;
+  fatherName: string | null;
+  motherName: string | null;
+  dob: string | null;
+  bloodGroup: string | null;
+  address: string | null;
+  parentMobile: string | null;
+  studentType: string | null;
+  roomNumber: string | null;
+  busNumber: string | null;
+  boardingPoint: string | null;
 }
 
 // Keep backward compat alias
@@ -68,6 +78,16 @@ function mapProfile(row: any): Profile {
     resumeLink: row.resume_link,
     portfolioLink: row.portfolio_link,
     profileCompleted: row.profile_completed ?? false,
+    fatherName: row.father_name,
+    motherName: row.mother_name,
+    dob: row.dob,
+    bloodGroup: row.blood_group,
+    address: row.address,
+    parentMobile: row.parent_mobile,
+    studentType: row.student_type,
+    roomNumber: row.room_number,
+    busNumber: row.bus_number,
+    boardingPoint: row.boarding_point,
   };
 }
 
@@ -166,6 +186,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (updates.resumeLink !== undefined) dbUpdates.resume_link = updates.resumeLink;
     if (updates.portfolioLink !== undefined) dbUpdates.portfolio_link = updates.portfolioLink;
     if (updates.profileCompleted !== undefined) dbUpdates.profile_completed = updates.profileCompleted;
+    if (updates.fatherName !== undefined) dbUpdates.father_name = updates.fatherName;
+    if (updates.motherName !== undefined) dbUpdates.mother_name = updates.motherName;
+    if (updates.dob !== undefined) dbUpdates.dob = updates.dob;
+    if (updates.bloodGroup !== undefined) dbUpdates.blood_group = updates.bloodGroup;
+    if (updates.address !== undefined) dbUpdates.address = updates.address;
+    if (updates.parentMobile !== undefined) dbUpdates.parent_mobile = updates.parentMobile;
+    if (updates.studentType !== undefined) dbUpdates.student_type = updates.studentType;
+    if (updates.roomNumber !== undefined) dbUpdates.room_number = updates.roomNumber;
+    if (updates.busNumber !== undefined) dbUpdates.bus_number = updates.busNumber;
+    if (updates.boardingPoint !== undefined) dbUpdates.boarding_point = updates.boardingPoint;
 
     await supabase.from("profiles").update(dbUpdates).eq("id", session.user.id);
     await fetchProfile(session.user.id);
