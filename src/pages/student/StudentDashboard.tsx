@@ -55,6 +55,15 @@ const StudentDashboard = () => {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Dashboard</h2>
         <p className="text-xs sm:text-sm text-muted-foreground">Welcome back{user?.name ? `, ${user.name}` : ""}</p>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
+          <Button
+            onClick={() => setShowID(true)}
+            className="mt-2 gap-2 bg-primary text-primary-foreground hover:bg-accent font-semibold"
+          >
+            <CreditCard size={18} />
+            Online ID Card
+          </Button>
+        </motion.div>
       </motion.div>
       <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
         {dashCards.map((stat, i) => (
