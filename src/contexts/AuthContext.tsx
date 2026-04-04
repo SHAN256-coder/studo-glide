@@ -186,6 +186,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (updates.resumeLink !== undefined) dbUpdates.resume_link = updates.resumeLink;
     if (updates.portfolioLink !== undefined) dbUpdates.portfolio_link = updates.portfolioLink;
     if (updates.profileCompleted !== undefined) dbUpdates.profile_completed = updates.profileCompleted;
+    if (updates.fatherName !== undefined) dbUpdates.father_name = updates.fatherName;
+    if (updates.motherName !== undefined) dbUpdates.mother_name = updates.motherName;
+    if (updates.dob !== undefined) dbUpdates.dob = updates.dob;
+    if (updates.bloodGroup !== undefined) dbUpdates.blood_group = updates.bloodGroup;
+    if (updates.address !== undefined) dbUpdates.address = updates.address;
+    if (updates.parentMobile !== undefined) dbUpdates.parent_mobile = updates.parentMobile;
+    if (updates.studentType !== undefined) dbUpdates.student_type = updates.studentType;
+    if (updates.roomNumber !== undefined) dbUpdates.room_number = updates.roomNumber;
+    if (updates.busNumber !== undefined) dbUpdates.bus_number = updates.busNumber;
+    if (updates.boardingPoint !== undefined) dbUpdates.boarding_point = updates.boardingPoint;
 
     await supabase.from("profiles").update(dbUpdates).eq("id", session.user.id);
     await fetchProfile(session.user.id);
