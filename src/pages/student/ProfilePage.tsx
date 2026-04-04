@@ -4,7 +4,8 @@ import { useAuth, DEPARTMENTS, SEMESTERS, YEARS } from "@/contexts/AuthContext";
 import { useAppContext } from "@/contexts/AppContext";
 import {
   User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar,
-  Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX
+  Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX,
+  Heart, MapPin, Bus, Home, UserCheck
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
