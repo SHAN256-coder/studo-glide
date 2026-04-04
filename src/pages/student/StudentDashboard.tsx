@@ -101,6 +101,9 @@ const StudentDashboard = () => {
           {apps.length === 0 && <p className="text-center text-muted-foreground text-sm py-8">No applications yet. Start by applying!</p>}
         </div>
       </motion.div>
+      <AnimatePresence>
+        {showID && <StudentIDCard open={showID} onClose={() => setShowID(false)} />}
+      </AnimatePresence>
     </div>
   );
 };
