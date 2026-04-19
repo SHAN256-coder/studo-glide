@@ -211,13 +211,10 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                 <div className="border-t-4 border-dashed border-[#003399] my-3" />
 
                 <div className="flex items-start gap-2 pt-1">
-                  <img src={collegeLogo} alt="College" className="h-8 w-8 object-contain rounded" />
-                  <div className="text-[8px] text-center flex-1 leading-tight">
-                    <p className="font-bold">DHAANISH NAGAR, PADAPPAI,</p>
-                    <p>CHENNAI, TAMILNADU INDIA,</p>
-                    <p>PIN-601301</p>
-                    <p>PH: 99620 22222</p>
-                    <p>www.dhaanishchennai.in</p>
+                  <img src={collegeLogo} alt="Smart Campus" className="h-8 w-8 object-contain rounded" />
+                  <div className="text-[9px] text-center flex-1 leading-tight">
+                    <p className="font-bold">SMART CAMPUS OD &amp; LEAVE</p>
+                    <p className="font-bold">MANAGEMENT SYSTEM</p>
                   </div>
                 </div>
               </div>
