@@ -205,14 +205,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (session?.user) await fetchProfile(session.user.id);
   };
 
-  const user: User | null = profile ? { ...profile, role } : null;
+  const user: User | null = useMemo(
+    () => (profile ? { ...profile, role } : null),
+    [profile, role]
+  );
 
-  return (
-    <AuthContext.Provider value={{
+  const value = useMemo(
+    () => ({
       user, session, profile, role,
       login, signup, loginWithPhone, verifyOtp, logout,
       updateProfile, isAuthenticated: !!session, loading, refreshProfile,
-    }}>
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, session, profile, role, loading]
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
