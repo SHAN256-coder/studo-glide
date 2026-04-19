@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -190,12 +190,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const refreshApplications = fetchApplications;
 
+  const value = useMemo(() => ({
+    applications, addApplication, updateStatus, getStudentApplications,
+    notifications, unreadCount, markNotificationRead, markAllRead,
+    soundEnabled, toggleSound, refreshApplications,
+  }), [applications, notifications, unreadCount, soundEnabled, addApplication, updateStatus, getStudentApplications, markNotificationRead, markAllRead, toggleSound, refreshApplications]);
+
   return (
-    <AppContext.Provider value={{
-      applications, addApplication, updateStatus, getStudentApplications,
-      notifications, unreadCount, markNotificationRead, markAllRead,
-      soundEnabled, toggleSound, refreshApplications,
-    }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );

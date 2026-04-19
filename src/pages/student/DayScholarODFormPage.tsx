@@ -190,8 +190,8 @@ const DayScholarODFormPage = () => {
         <div className="overflow-auto rounded-lg border border-border">
           <div ref={formRef} style={{ width: "794px", padding: "35px 45px", backgroundColor: "#ffffff", color: "#000000", fontFamily: "'Times New Roman', serif", lineHeight: "1.5" }}>
             <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <h2 style={{ fontSize: 16, fontWeight: "bold", marginTop: 0 }}>DHAANISH AHMED COLLEGE OF ENGINEERING</h2>
-              <p style={{ fontSize: 12, margin: "2px 0" }}>Padappai, Chennai – 601301</p>
+              <h2 style={{ fontSize: 16, fontWeight: "bold", marginTop: 0 }}>SMART CAMPUS OD &amp; LEAVE MANAGEMENT SYSTEM</h2>
+              
               <h3 style={{ fontSize: 14, fontWeight: "bold", marginTop: 8, textDecoration: "underline" }}>DAY SCHOLAR — ON DUTY PERMISSION FORM</h3>
             </div>
 

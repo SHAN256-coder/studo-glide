@@ -138,11 +138,11 @@ const StudentIDCard = ({ open, onClose }: Props) => {
             >
               <div className="bg-white text-black">
                 <div className="bg-[#003399] text-white p-3 flex items-start gap-2">
-                  <img src={collegeLogo} alt="College" className="h-12 w-12 object-contain rounded" />
+                  <img src={collegeLogo} alt="Smart Campus" className="h-12 w-12 object-contain rounded" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold leading-tight">DHAANISH AHMED COLLEGE OF ENGINEERING</p>
-                    <p className="text-[8px] opacity-90 leading-tight">An Autonomous Institution, NAAC A+ | 4 Star India Rating</p>
-                    <p className="text-[8px] opacity-90 leading-tight">5th Rank in Tamil Nadu | An ISO 9001:2015 Certified</p>
+                    <p className="text-[10px] font-bold leading-tight">SMART CAMPUS OD &amp; LEAVE</p>
+                    <p className="text-[10px] font-bold leading-tight">MANAGEMENT SYSTEM</p>
+                    <p className="text-[8px] opacity-90 leading-tight mt-0.5">Student Identification Card</p>
                   </div>
                 </div>
 
@@ -211,13 +211,10 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                 <div className="border-t-4 border-dashed border-[#003399] my-3" />
 
                 <div className="flex items-start gap-2 pt-1">
-                  <img src={collegeLogo} alt="College" className="h-8 w-8 object-contain rounded" />
-                  <div className="text-[8px] text-center flex-1 leading-tight">
-                    <p className="font-bold">DHAANISH NAGAR, PADAPPAI,</p>
-                    <p>CHENNAI, TAMILNADU INDIA,</p>
-                    <p>PIN-601301</p>
-                    <p>PH: 99620 22222</p>
-                    <p>www.dhaanishchennai.in</p>
+                  <img src={collegeLogo} alt="Smart Campus" className="h-8 w-8 object-contain rounded" />
+                  <div className="text-[9px] text-center flex-1 leading-tight">
+                    <p className="font-bold">SMART CAMPUS OD &amp; LEAVE</p>
+                    <p className="font-bold">MANAGEMENT SYSTEM</p>
                   </div>
                 </div>
               </div>

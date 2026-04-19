@@ -90,10 +90,9 @@ const LoginPage = () => {
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-6">
-          <img src={collegeLogo} alt="Dhaanish Connect" className="h-16 mx-auto mb-3 rounded" />
+          <img src={collegeLogo} alt="Smart Campus" className="h-16 mx-auto mb-3 rounded" />
           <h1 className="text-xl sm:text-2xl font-display font-bold gold-gradient-text">Smart Campus OD & Leave</h1>
           <p className="text-muted-foreground text-xs sm:text-sm mt-1">Management System</p>
-          <p className="text-primary text-[10px] mt-0.5 font-medium">Dhaanish Connect</p>
         </div>
 
         {/* Sign In / Sign Up Toggle */}
