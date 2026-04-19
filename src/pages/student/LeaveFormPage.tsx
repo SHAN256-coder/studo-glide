@@ -118,7 +118,7 @@ const LeaveFormPage = () => {
           <div style={{ textAlign: "center", marginBottom: 16 }}>
             <img src={collegeLogo} alt="College Logo" style={{ height: 60, margin: "0 auto" }} />
             <h2 style={{ fontSize: 16, fontWeight: "bold", marginTop: 8 }}>SMART CAMPUS OD &amp; LEAVE MANAGEMENT SYSTEM</h2>
-            <p style={{ fontSize: 12 }}>Padappai, Chennai – 601301</p>
+            
             <h3 style={{ fontSize: 14, fontWeight: "bold", marginTop: 8, textDecoration: "underline" }}>LEAVE APPLICATION FORM</h3>
           </div>
 
