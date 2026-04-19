@@ -144,4 +144,15 @@
     background-size: 200% 100%;
     animation: shimmer 3s ease-in-out infinite;
   }
+
+  /* Make native date/time picker icon gold/yellow so it's visible on dark inputs */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator,
+  input[type="week"]::-webkit-calendar-picker-indicator {
+    filter: invert(78%) sepia(85%) saturate(700%) hue-rotate(360deg) brightness(105%) contrast(105%);
+    cursor: pointer;
+    opacity: 1;
+  }
 }
