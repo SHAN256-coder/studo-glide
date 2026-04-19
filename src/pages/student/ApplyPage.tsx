@@ -143,7 +143,7 @@ const ApplyPage = () => {
       return;
     }
     const typeMap: Record<FormType, string> = {
-      "od-hosteller": "od",
+      "od-hosteller": "hostel-od",
       "od-dayscholar": "day-scholar-od",
       "leave-hosteller": "leave",
       "leave-dayscholar": "leave",
@@ -151,7 +151,7 @@ const ApplyPage = () => {
       "absent-dayscholar": "leave",
       "industrial-visit": "industrial-visit",
       "internship": "internship",
-      "siph-od": "od",
+      "siph-od": "siph-od",
     };
     addApplication({
       studentId: user!.id,
