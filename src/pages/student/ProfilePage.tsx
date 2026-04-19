@@ -5,7 +5,7 @@ import { useAppContext } from "@/contexts/AppContext";
 import {
   User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar,
   Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX,
-  Heart, MapPin, Bus, Home, UserCheck
+  Heart, MapPin, Bus, Home, UserCheck, FileSpreadsheet
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
@@ -32,6 +33,55 @@ const ProfilePage = () => {
     updateProfile(draft as any);
     setEditing(false);
     toast.success("Profile updated!");
+  };
+
+  const handleExportYearlyExcel = () => {
+    const year = new Date().getFullYear();
+    const wb = XLSX.utils.book_new();
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    monthNames.forEach((monthName, monthIdx) => {
+      const monthApps = apps.filter((a) => {
+        const d = new Date((a as any).createdAt || (a as any).created_at || Date.now());
+        return d.getFullYear() === year && d.getMonth() === monthIdx;
+      });
+      const header = [
+        ["Student Name", user?.name || ""],
+        ["Register Number", user?.registerNumber || ""],
+        ["Department", user?.department || ""],
+        ["Year/Semester", `${user?.year || ""} / ${user?.semester || ""}`],
+        ["Month", `${monthName} ${year}`],
+        [],
+        ["S.No","Date","Type","From Date","To Date","Reason","Status"],
+      ];
+      const rows = monthApps.map((a, i) => [
+        i + 1,
+        new Date((a as any).createdAt || (a as any).created_at || Date.now()).toLocaleDateString(),
+        a.type,
+        a.fromDate || "",
+        a.toDate || "",
+        a.reason || "",
+        a.status,
+      ]);
+      const summary = [
+        [],
+        ["Summary"],
+        ["Total Applications", monthApps.length],
+        ["Approved", monthApps.filter((a) => a.status === "approved").length],
+        ["Pending", monthApps.filter((a) => a.status === "pending").length],
+        ["Rejected", monthApps.filter((a) => a.status === "rejected").length],
+        ["OD (Hosteller)", monthApps.filter((a) => a.type === "hostel-od").length],
+        ["OD (Day Scholar)", monthApps.filter((a) => a.type === "day-scholar-od").length],
+        ["SIPH OD", monthApps.filter((a) => a.type === "siph-od").length],
+        ["Leave", monthApps.filter((a) => a.type === "leave").length],
+      ];
+      const ws = XLSX.utils.aoa_to_sheet([...header, ...rows, ...summary]);
+      ws["!cols"] = [{ wch: 6 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 30 }, { wch: 12 }];
+      XLSX.utils.book_append_sheet(wb, ws, monthName);
+    });
+
+    XLSX.writeFile(wb, `${user?.registerNumber || "student"}_${year}_Monthly_Report.xlsx`);
+    toast.success("Yearly Excel report downloaded!");
   };
 
   const handlePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,6 +247,20 @@ const ProfilePage = () => {
           <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
         </div>
         <p className="text-xs text-muted-foreground mt-2">Scan to verify student identity</p>
+      </motion.div>
+
+      {/* Monthly Excel Report */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }} className="glass-card p-4 sm:p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <FileSpreadsheet size={20} className="text-primary" />
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-card-foreground">Monthly Submission Report</h3>
+            <p className="text-xs text-muted-foreground">One Excel file with 12 monthly sheets for {new Date().getFullYear()}</p>
+          </div>
+        </div>
+        <Button onClick={handleExportYearlyExcel} className="w-full gap-2">
+          <FileSpreadsheet size={16} /> Download Yearly Excel ({new Date().getFullYear()})
+        </Button>
       </motion.div>
 
       {/* History Summary */}

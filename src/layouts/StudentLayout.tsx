@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTapSound } from "@/hooks/useTapSound";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, FileText, User, LogOut, ClipboardList, Calendar as CalendarIcon
+  LayoutDashboard, FileText, User, LogOut, ClipboardList
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 
@@ -19,7 +19,6 @@ const StudentLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const playTap = useTapSound();
-  const [showCalendar, setShowCalendar] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -40,61 +39,6 @@ const StudentLayout = () => {
     { to: "/dashboard/profile", icon: User, label: "Profile" },
   ];
 
-  // Generate 12-month calendar
-  const renderYearCalendar = () => {
-    const year = currentTime.getFullYear();
-    const months = Array.from({ length: 12 }, (_, i) => i);
-    const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        className="absolute top-full left-0 right-0 z-50 glass-card border border-border/50 p-3 mt-1 max-h-[70vh] overflow-auto"
-      >
-        <h3 className="text-sm font-bold text-primary text-center mb-2">{year} Calendar</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {months.map((m) => {
-            const monthDate = new Date(year, m, 1);
-            const daysInMonth = new Date(year, m + 1, 0).getDate();
-            const firstDay = monthDate.getDay();
-            const today = currentTime.getDate();
-            const isCurrentMonth = m === currentTime.getMonth();
-
-            return (
-              <div key={m} className="bg-secondary/50 rounded p-1.5">
-                <p className="text-[10px] font-bold text-primary text-center mb-1">
-                  {monthDate.toLocaleString("default", { month: "short" })}
-                </p>
-                <div className="grid grid-cols-7 gap-0">
-                  {dayNames.map((d) => (
-                    <span key={d} className="text-[7px] text-muted-foreground text-center">{d}</span>
-                  ))}
-                  {Array.from({ length: firstDay }, (_, i) => (
-                    <span key={`e${i}`} />
-                  ))}
-                  {Array.from({ length: daysInMonth }, (_, i) => (
-                    <span
-                      key={i + 1}
-                      className={`text-[8px] text-center rounded ${
-                        isCurrentMonth && i + 1 === today
-                          ? "bg-primary text-primary-foreground font-bold"
-                          : "text-card-foreground"
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </motion.div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-background">
       {/* Top Header */}
@@ -108,14 +52,6 @@ const StudentLayout = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Calendar icon */}
-            <button
-              onClick={() => { playTap(); setShowCalendar(!showCalendar); }}
-              className="text-primary hover:text-accent transition-colors p-1.5"
-              title="Calendar"
-            >
-              <CalendarIcon size={18} />
-            </button>
             {/* Date/Time */}
             <div className="text-right hidden sm:block">
               <p className="text-[9px] text-muted-foreground">{currentTime.toLocaleDateString()}</p>
@@ -126,10 +62,6 @@ const StudentLayout = () => {
             </button>
           </div>
         </div>
-        {/* Calendar dropdown */}
-        <AnimatePresence>
-          {showCalendar && renderYearCalendar()}
-        </AnimatePresence>
       </header>
 
       <div className="flex">
