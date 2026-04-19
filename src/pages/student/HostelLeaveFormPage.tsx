@@ -16,7 +16,7 @@ const boldCell: React.CSSProperties = { ...cellStyle, fontWeight: "bold" };
 const LeaveFormCopy = ({ title, data }: { title: string; data: Record<string, string> }) => (
   <div style={{ marginBottom: "30px" }}>
     <h2 style={{ textAlign: "center", fontWeight: "bold", fontSize: "16px", margin: "0 0 2px" }}>
-      Dhaanish Ahmed College of Engineering, Chennai
+      Smart Campus OD &amp; Leave Management System
     </h2>
     <h3 style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", margin: "0 0 12px" }}>
       {title}

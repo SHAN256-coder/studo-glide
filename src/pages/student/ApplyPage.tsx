@@ -302,7 +302,7 @@ const ApplyPage = () => {
     const renderCopy = (title: string) => (
       <div style={{ marginBottom: "30px" }}>
         <h2 style={{ textAlign: "center", fontWeight: "bold", fontSize: "16px", margin: "0 0 2px" }}>
-          Dhaanish Ahmed College of Engineering, Chennai
+          Smart Campus OD &amp; Leave Management System
         </h2>
         <h3 style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", margin: "0 0 12px" }}>{title}</h3>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -387,7 +387,7 @@ const ApplyPage = () => {
     <div ref={formRef} style={{ width: 794, fontFamily: "serif", fontSize: 13, background: "#fff", color: "#000", padding: 40 }}>
       <div style={{ textAlign: "center", marginBottom: 16 }}>
         <img src={collegeLogo} alt="College Logo" style={{ height: 60, margin: "0 auto" }} />
-        <h2 style={{ fontSize: 16, fontWeight: "bold", marginTop: 8 }}>DHAANISH AHMED COLLEGE OF ENGINEERING</h2>
+        <h2 style={{ fontSize: 16, fontWeight: "bold", marginTop: 8 }}>SMART CAMPUS OD &amp; LEAVE MANAGEMENT SYSTEM</h2>
         <p style={{ fontSize: 12 }}>Padappai, Chennai – 601301</p>
         <h3 style={{ fontSize: 14, fontWeight: "bold", marginTop: 8, textDecoration: "underline" }}>{formTitleMap[selectedForm!]}</h3>
       </div>
