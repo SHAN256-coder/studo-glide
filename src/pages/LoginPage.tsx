@@ -26,6 +26,10 @@ const LoginPage = () => {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const [mobileMode, setMobileMode] = useState<"signin" | "forgot">("signin");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [resetVerified, setResetVerified] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const { login, signup, loginWithPhone, verifyOtp } = useAuth();
@@ -107,6 +111,68 @@ const LoginPage = () => {
       const { error } = await verifyOtp(phone.trim(), otpCode.trim());
       if (error) toast.error(error);
       else toast.success("Login successful!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRequestMobileReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = phone.trim();
+    if (!trimmed.startsWith("+") || trimmed.length < 8) {
+      toast.error("Enter mobile in international format (e.g. +919876543210).");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("request-mobile-reset", {
+        body: { phone: trimmed },
+      });
+      if (error || (data as any)?.error) {
+        toast.error((data as any)?.error || error?.message || "Failed to send OTP.");
+      } else {
+        toast.success("OTP sent to your mobile.");
+        setOtpSent(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyResetOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpCode.trim()) {
+      toast.error("Enter the OTP code.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await verifyOtp(phone.trim(), otpCode.trim());
+      if (error) toast.error(error);
+      else {
+        toast.success("Verified! Set your new password.");
+        setResetVerified(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSetNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      toast.error("Passwords don't match.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) toast.error(error.message);
+      else toast.success("Password updated! You're signed in.");
     } finally {
       setIsLoading(false);
     }
@@ -276,10 +342,17 @@ const LoginPage = () => {
         )}
 
         {/* MOBILE: OTP login */}
-        {method === "mobile" && (
+        {method === "mobile" && mobileMode === "signin" && (
           <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp} className="glass-card p-5 space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-card-foreground text-sm">Mobile Number</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-card-foreground text-sm">Mobile Number</Label>
+                {!otpSent && (
+                  <button type="button" onClick={() => { setMobileMode("forgot"); setOtpSent(false); setOtpCode(""); }} className="text-xs text-primary hover:underline">
+                    Forgot mobile?
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -313,6 +386,101 @@ const LoginPage = () => {
             </Button>
 
             {otpSent && (
+              <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="w-full text-xs text-muted-foreground hover:text-card-foreground">
+                Change number
+              </button>
+            )}
+          </form>
+        )}
+
+        {method === "mobile" && mobileMode === "forgot" && (
+          <form
+            onSubmit={resetVerified ? handleSetNewPassword : (otpSent ? handleVerifyResetOtp : handleRequestMobileReset)}
+            className="glass-card p-5 space-y-4"
+          >
+            <button
+              type="button"
+              onClick={() => { setMobileMode("signin"); setOtpSent(false); setOtpCode(""); setResetVerified(false); setNewPassword(""); setConfirmNewPassword(""); }}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-card-foreground"
+            >
+              <ArrowLeft size={14} /> Back to Mobile Sign In
+            </button>
+            <div>
+              <h2 className="text-card-foreground font-semibold">Reset Password via Mobile</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {!otpSent && "Enter your registered mobile to receive an OTP."}
+                {otpSent && !resetVerified && "Enter the OTP we sent to your mobile."}
+                {resetVerified && "Set a new password for your account."}
+              </p>
+            </div>
+
+            {!resetVerified && (
+              <div className="space-y-1.5">
+                <Label className="text-card-foreground text-sm">Mobile Number</Label>
+                <div className="relative">
+                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 9876543210"
+                    disabled={otpSent}
+                    className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
+                  />
+                </div>
+              </div>
+            )}
+
+            {otpSent && !resetVerified && (
+              <div className="space-y-1.5">
+                <Label className="text-card-foreground text-sm">OTP Code</Label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  placeholder="6-digit code"
+                  className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary tracking-widest text-center"
+                />
+              </div>
+            )}
+
+            {resetVerified && (
+              <>
+                <div className="space-y-1.5">
+                  <Label className="text-card-foreground text-sm">New Password</Label>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    className="bg-input border-border text-card-foreground focus:ring-primary"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-card-foreground text-sm">Confirm Password</Label>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    placeholder="Re-enter password"
+                    className="bg-input border-border text-card-foreground focus:ring-primary"
+                  />
+                </div>
+              </>
+            )}
+
+            <Button type="submit" disabled={isLoading} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
+              {isLoading
+                ? "Please wait..."
+                : resetVerified
+                  ? "Update Password"
+                  : otpSent
+                    ? "Verify OTP"
+                    : "Send OTP"}
+            </Button>
+
+            {otpSent && !resetVerified && (
               <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="w-full text-xs text-muted-foreground hover:text-card-foreground">
                 Change number
               </button>
