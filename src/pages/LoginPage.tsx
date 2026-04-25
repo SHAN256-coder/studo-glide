@@ -26,6 +26,10 @@ const LoginPage = () => {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const [mobileMode, setMobileMode] = useState<"signin" | "forgot">("signin");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [resetVerified, setResetVerified] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const { login, signup, loginWithPhone, verifyOtp } = useAuth();
