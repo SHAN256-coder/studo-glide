@@ -116,6 +116,68 @@ const LoginPage = () => {
     }
   };
 
+  const handleRequestMobileReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = phone.trim();
+    if (!trimmed.startsWith("+") || trimmed.length < 8) {
+      toast.error("Enter mobile in international format (e.g. +919876543210).");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("request-mobile-reset", {
+        body: { phone: trimmed },
+      });
+      if (error || (data as any)?.error) {
+        toast.error((data as any)?.error || error?.message || "Failed to send OTP.");
+      } else {
+        toast.success("OTP sent to your mobile.");
+        setOtpSent(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyResetOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpCode.trim()) {
+      toast.error("Enter the OTP code.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await verifyOtp(phone.trim(), otpCode.trim());
+      if (error) toast.error(error);
+      else {
+        toast.success("Verified! Set your new password.");
+        setResetVerified(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSetNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      toast.error("Passwords don't match.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) toast.error(error.message);
+      else toast.success("Password updated! You're signed in.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
