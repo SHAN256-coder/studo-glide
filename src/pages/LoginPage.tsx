@@ -80,16 +80,25 @@ const LoginPage = () => {
     }
   };
 
+  const normalizeIndianMobile = (raw: string): string | null => {
+    const digits = raw.replace(/\D/g, "");
+    // Accept "9876543210" or "919876543210"
+    if (digits.length === 10) return `+91${digits}`;
+    if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
+    return null;
+  };
+
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = phone.trim();
-    if (!trimmed.startsWith("+") || trimmed.length < 8) {
-      toast.error("Enter mobile in international format (e.g. +919876543210).");
+    const normalized = normalizeIndianMobile(phone);
+    if (!normalized) {
+      toast.error("Enter a valid 10-digit mobile number.");
       return;
     }
+    setPhone(normalized);
     setIsLoading(true);
     try {
-      const { error } = await loginWithPhone(trimmed);
+      const { error } = await loginWithPhone(normalized);
       if (error) toast.error(error);
       else {
         toast.success("OTP sent to your mobile.");
@@ -118,15 +127,16 @@ const LoginPage = () => {
 
   const handleRequestMobileReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = phone.trim();
-    if (!trimmed.startsWith("+") || trimmed.length < 8) {
-      toast.error("Enter mobile in international format (e.g. +919876543210).");
+    const normalized = normalizeIndianMobile(phone);
+    if (!normalized) {
+      toast.error("Enter a valid 10-digit mobile number.");
       return;
     }
+    setPhone(normalized);
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("request-mobile-reset", {
-        body: { phone: trimmed },
+        body: { phone: normalized },
       });
       if (error || (data as any)?.error) {
         toast.error((data as any)?.error || error?.message || "Failed to send OTP.");
@@ -359,12 +369,13 @@ const LoginPage = () => {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 9876543210"
+                  placeholder="9876543210"
+                  maxLength={10}
                   disabled={otpSent}
                   className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
                 />
               </div>
-              <p className="text-[10px] text-muted-foreground">Include country code (e.g. +91 for India)</p>
+              <p className="text-[10px] text-muted-foreground">Indian mobile number (10 digits)</p>
             </div>
 
             {otpSent && (
@@ -423,7 +434,8 @@ const LoginPage = () => {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 9876543210"
+                    placeholder="9876543210"
+                    maxLength={10}
                     disabled={otpSent}
                     className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
                   />
