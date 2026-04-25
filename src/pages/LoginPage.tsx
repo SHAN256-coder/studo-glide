@@ -127,15 +127,16 @@ const LoginPage = () => {
 
   const handleRequestMobileReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = phone.trim();
-    if (!trimmed.startsWith("+") || trimmed.length < 8) {
-      toast.error("Enter mobile in international format (e.g. +919876543210).");
+    const normalized = normalizeIndianMobile(phone);
+    if (!normalized) {
+      toast.error("Enter a valid 10-digit mobile number.");
       return;
     }
+    setPhone(normalized);
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("request-mobile-reset", {
-        body: { phone: trimmed },
+        body: { phone: normalized },
       });
       if (error || (data as any)?.error) {
         toast.error((data as any)?.error || error?.message || "Failed to send OTP.");
@@ -432,7 +433,8 @@ const LoginPage = () => {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 9876543210"
+                    placeholder="9876543210"
+                    maxLength={10}
                     disabled={otpSent}
                     className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
                   />
