@@ -1,1 +1,4 @@
 project_id = "zknnldswmgyrqkolhoyy"
+
+[functions.request-mobile-reset]
+verify_jwt = false
