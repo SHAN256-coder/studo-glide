@@ -1,86 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, KeyRound, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import collegeLogo from "@/assets/college-logo.png";
 
-type AuthMethod = "password" | "otp";
 type EmailMode = "signin" | "signup" | "forgot";
 
-const MAX_OTP_ATTEMPTS = 3;
-const LOCKOUT_MINUTES = 15;
-const OTP_VALIDITY_SECONDS = 300; // 5 minutes — must match Supabase OTP expiry
-const LS_KEY = "otp_lockout_v1";
-
-type LockoutState = { email: string; attempts: number; lockedUntil: number | null };
-
-function readLockout(): LockoutState | null {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? (JSON.parse(raw) as LockoutState) : null;
-  } catch {
-    return null;
-  }
-}
-function writeLockout(state: LockoutState | null) {
-  if (!state) localStorage.removeItem(LS_KEY);
-  else localStorage.setItem(LS_KEY, JSON.stringify(state));
-}
-
 const LoginPage = () => {
-  const [method, setMethod] = useState<AuthMethod>("password");
   const [mode, setMode] = useState<EmailMode>("signin");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // OTP state
-  const [otpEmail, setOtpEmail] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
-  const [attemptsLeft, setAttemptsLeft] = useState(MAX_OTP_ATTEMPTS);
-  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
-  const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(null);
-  const [now, setNow] = useState(Date.now());
-
   const [isLoading, setIsLoading] = useState(false);
-  const { login, signup, loginWithEmailOtp, verifyEmailOtp } = useAuth();
-
-  // Restore lockout for the current OTP email
-  useEffect(() => {
-    const saved = readLockout();
-    if (!saved) return;
-    if (saved.email === otpEmail.trim().toLowerCase()) {
-      setAttemptsLeft(Math.max(0, MAX_OTP_ATTEMPTS - saved.attempts));
-      setLockedUntil(saved.lockedUntil);
-    }
-  }, [otpEmail]);
-
-  // Tick every second whenever lockout or OTP expiry is active
-  useEffect(() => {
-    if (!lockedUntil && !otpExpiresAt) return;
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [lockedUntil, otpExpiresAt]);
-
-  const isLocked = !!lockedUntil && lockedUntil > now;
-  const lockoutSecondsLeft = isLocked ? Math.ceil((lockedUntil! - now) / 1000) : 0;
-  const otpSecondsLeft = otpExpiresAt ? Math.max(0, Math.ceil((otpExpiresAt - now) / 1000)) : 0;
-  const otpExpired = !!otpExpiresAt && otpSecondsLeft <= 0;
-
-  // Auto-invalidate the code in the UI when expiry hits
-  useEffect(() => {
-    if (otpExpired && otpSent) {
-      setOtpCode("");
-    }
-  }, [otpExpired, otpSent]);
+  const { login, signup } = useAuth();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,80 +68,6 @@ const LoginPage = () => {
     }
   };
 
-  const handleSendEmailOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const target = otpEmail.trim().toLowerCase();
-    if (!target || !target.includes("@")) {
-      toast.error("Enter a valid email address.");
-      return;
-    }
-    if (isLocked) {
-      toast.error(`Too many attempts. Try again in ${lockoutSecondsLeft}s.`);
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await loginWithEmailOtp(target);
-      if (error) toast.error(error);
-      else {
-        toast.success("OTP sent to your email. Valid for 5 minutes.");
-        setOtpSent(true);
-        setOtpCode("");
-        setOtpExpiresAt(Date.now() + OTP_VALIDITY_SECONDS * 1000);
-        // reset attempt counter for a fresh send
-        setAttemptsLeft(MAX_OTP_ATTEMPTS);
-        writeLockout({ email: target, attempts: 0, lockedUntil: null });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyEmailOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const target = otpEmail.trim().toLowerCase();
-    if (isLocked) {
-      toast.error(`Locked. Try again in ${lockoutSecondsLeft}s.`);
-      return;
-    }
-    if (otpExpired) {
-      toast.error("OTP has expired. Please request a new code.");
-      return;
-    }
-    if (!otpCode.trim()) {
-      toast.error("Enter the OTP code.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await verifyEmailOtp(target, otpCode.trim());
-      if (error) {
-        const saved = readLockout();
-        const prevAttempts = saved && saved.email === target ? saved.attempts : 0;
-        const newAttempts = prevAttempts + 1;
-        const remaining = Math.max(0, MAX_OTP_ATTEMPTS - newAttempts);
-        setAttemptsLeft(remaining);
-
-        if (newAttempts >= MAX_OTP_ATTEMPTS) {
-          const lockUntil = Date.now() + LOCKOUT_MINUTES * 60 * 1000;
-          setLockedUntil(lockUntil);
-          writeLockout({ email: target, attempts: newAttempts, lockedUntil: lockUntil });
-          toast.error(`Too many wrong attempts. Locked for ${LOCKOUT_MINUTES} minutes.`);
-        } else {
-          writeLockout({ email: target, attempts: newAttempts, lockedUntil: null });
-          toast.error(`${error}. ${remaining} attempt(s) left.`);
-        }
-        setOtpCode("");
-      } else {
-        toast.success("Login successful!");
-        writeLockout(null);
-        setOtpExpiresAt(null);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
@@ -242,23 +108,8 @@ const LoginPage = () => {
           <p className="text-muted-foreground text-xs sm:text-sm mt-1">Management System</p>
         </div>
 
-        {/* Method toggle: Password / Email OTP */}
-        <div className="flex gap-2 mb-3">
-          {(["password", "otp"] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => { setMethod(m); setMode("signin"); setOtpSent(false); setOtpCode(""); }}
-              className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all duration-300 flex items-center justify-center gap-1.5 ${
-                method === m ? "bg-primary text-primary-foreground border-primary gold-glow" : "glass-card text-muted-foreground hover:text-card-foreground"
-              }`}
-            >
-              {m === "password" ? <><Mail size={14} /> Password</> : <><KeyRound size={14} /> Email OTP</>}
-            </button>
-          ))}
-        </div>
-
-        {/* Sign In / Sign Up toggle (password only, hidden on forgot) */}
-        {method === "password" && mode !== "forgot" && (
+        {/* Sign In / Sign Up toggle (hidden on forgot) */}
+        {mode !== "forgot" && (
           <div className="flex gap-2 mb-5">
             {(["signin", "signup"] as const).map((m) => (
               <button
@@ -275,7 +126,7 @@ const LoginPage = () => {
         )}
 
         {/* Forgot password form */}
-        {method === "password" && mode === "forgot" && (
+        {mode === "forgot" && (
           <form onSubmit={handleForgotPassword} className="glass-card p-5 space-y-4">
             <button type="button" onClick={() => setMode("signin")} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-card-foreground">
               <ArrowLeft size={14} /> Back to Sign In
@@ -304,7 +155,7 @@ const LoginPage = () => {
         )}
 
         {/* Password sign in / sign up form */}
-        {method === "password" && mode !== "forgot" && (
+        {mode !== "forgot" && (
           <form onSubmit={handleEmailAuth} className="glass-card p-5 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-card-foreground text-sm">Email</Label>
@@ -362,80 +213,6 @@ const LoginPage = () => {
               </svg>
               Sign in with Google
             </Button>
-          </form>
-        )}
-
-        {/* EMAIL OTP login */}
-        {method === "otp" && (
-          <form onSubmit={otpSent && !otpExpired ? handleVerifyEmailOtp : handleSendEmailOtp} className="glass-card p-5 space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-card-foreground text-sm">Email Address</Label>
-              <div className="relative">
-                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="email"
-                  value={otpEmail}
-                  onChange={(e) => setOtpEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  disabled={otpSent}
-                  className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground">We'll email you a 6-digit code.</p>
-            </div>
-
-            {otpSent && (
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label className="text-card-foreground text-sm">OTP Code</Label>
-                  {!isLocked && otpExpiresAt && (
-                    <span className={`text-[11px] font-mono tabular-nums ${otpExpired ? "text-destructive" : otpSecondsLeft <= 30 ? "text-destructive" : "text-primary"}`}>
-                      {otpExpired
-                        ? "Expired"
-                        : `Expires in ${Math.floor(otpSecondsLeft / 60)}:${String(otpSecondsLeft % 60).padStart(2, "0")}`}
-                    </span>
-                  )}
-                </div>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  placeholder="6-digit code"
-                  disabled={isLocked || otpExpired}
-                  className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary tracking-widest text-center"
-                />
-                {isLocked ? (
-                  <p className="text-[11px] text-destructive">
-                    Too many wrong attempts. Try again in {Math.floor(lockoutSecondsLeft / 60)}m {lockoutSecondsLeft % 60}s.
-                  </p>
-                ) : otpExpired ? (
-                  <p className="text-[11px] text-destructive">
-                    Code expired. Click "Resend OTP" to get a new one.
-                  </p>
-                ) : (
-                  <p className="text-[11px] text-muted-foreground">
-                    {attemptsLeft} of {MAX_OTP_ATTEMPTS} attempt(s) left.
-                  </p>
-                )}
-              </div>
-            )}
-
-            <Button type="submit" disabled={isLoading || isLocked} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
-              {isLoading
-                ? "Please wait..."
-                : !otpSent
-                ? "Send OTP"
-                : otpExpired
-                ? "Resend OTP"
-                : "Verify & Sign In"}
-            </Button>
-
-            {otpSent && (
-              <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="w-full text-xs text-muted-foreground hover:text-card-foreground">
-                Change email
-              </button>
-            )}
           </form>
         )}
 
