@@ -144,8 +144,10 @@ const LoginPage = () => {
       const { error } = await loginWithEmailOtp(target);
       if (error) toast.error(error);
       else {
-        toast.success("OTP sent to your email.");
+        toast.success("OTP sent to your email. Valid for 5 minutes.");
         setOtpSent(true);
+        setOtpCode("");
+        setOtpExpiresAt(Date.now() + OTP_VALIDITY_SECONDS * 1000);
         // reset attempt counter for a fresh send
         setAttemptsLeft(MAX_OTP_ATTEMPTS);
         writeLockout({ email: target, attempts: 0, lockedUntil: null });
