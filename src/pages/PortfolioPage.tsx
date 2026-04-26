@@ -36,13 +36,14 @@ const PortfolioPage = () => {
     const load = async () => {
       if (!userId) return;
       setLoading(true);
-      const { data, error } = await supabase.rpc("get_public_portfolio" as never, {
+      const { data: rpcData, error: rpcError } = await supabase.rpc("get_public_portfolio" as never, {
         _user_id: userId,
       } as never);
-      if (error) {
-        setError(error.message);
+      if (rpcError) {
+        setError(rpcError.message);
       } else {
-        const row = Array.isArray(data) ? (data[0] as PublicPortfolio | undefined) : (data as PublicPortfolio | null);
+        const arr = (rpcData ?? []) as PublicPortfolio[];
+        const row = Array.isArray(arr) ? arr[0] : (rpcData as PublicPortfolio | null);
         if (!row) setError("Portfolio not found.");
         else setData(row);
       }
