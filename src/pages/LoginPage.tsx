@@ -195,6 +195,7 @@ const LoginPage = () => {
       } else {
         toast.success("Login successful!");
         writeLockout(null);
+        setOtpExpiresAt(null);
       }
     } finally {
       setIsLoading(false);
