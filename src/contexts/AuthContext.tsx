@@ -32,6 +32,7 @@ export interface Profile {
   roomNumber: string | null;
   busNumber: string | null;
   boardingPoint: string | null;
+  bio: string | null;
 }
 
 // Keep backward compat alias
@@ -90,6 +91,7 @@ function mapProfile(row: any): Profile {
     roomNumber: row.room_number,
     busNumber: row.bus_number,
     boardingPoint: row.boarding_point,
+    bio: row.bio ?? null,
   };
 }
 
@@ -211,6 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (updates.roomNumber !== undefined) dbUpdates.room_number = updates.roomNumber;
     if (updates.busNumber !== undefined) dbUpdates.bus_number = updates.busNumber;
     if (updates.boardingPoint !== undefined) dbUpdates.boarding_point = updates.boardingPoint;
+    if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
 
     await supabase.from("profiles").update(dbUpdates).eq("id", session.user.id);
     await fetchProfile(session.user.id);

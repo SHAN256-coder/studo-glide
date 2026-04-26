@@ -240,13 +240,50 @@ const ProfilePage = () => {
         </div>
       </motion.div>
 
-      {/* QR Code */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-4 sm:p-5 text-center">
-        <h3 className="text-base font-semibold text-card-foreground mb-3">Your Profile QR</h3>
-        <div className="inline-block bg-white p-3 rounded-lg">
-          <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
+      {/* About / Bio */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.27 }} className="glass-card p-4 sm:p-5 space-y-2">
+        <h3 className="text-base font-semibold text-card-foreground">About Me</h3>
+        <p className="text-xs text-muted-foreground">Shown on your public portfolio page.</p>
+        {editing ? (
+          <textarea
+            value={displayVal("bio")}
+            onChange={(e) => setDraft((prev) => ({ ...prev, bio: e.target.value }))}
+            placeholder="Write a short intro about yourself, your interests, projects you're proud of, etc."
+            rows={4}
+            maxLength={500}
+            className="w-full bg-input border border-border rounded-md p-2 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        ) : (
+          <p className="text-sm text-card-foreground whitespace-pre-wrap">
+            {displayVal("bio") || <span className="text-muted-foreground italic">No bio yet. Click Edit to add one.</span>}
+          </p>
+        )}
+      </motion.div>
+
+      {/* QR Codes */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="glass-card p-4 sm:p-5 text-center">
+          <h3 className="text-sm font-semibold text-card-foreground mb-3">Identity QR</h3>
+          <div className="inline-block bg-white p-3 rounded-lg">
+            <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-2">Scan to verify identity</p>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">Scan to verify student identity</p>
+        <div className="glass-card p-4 sm:p-5 text-center border-2 border-primary/40">
+          <h3 className="text-sm font-semibold text-card-foreground mb-3">Share Portfolio</h3>
+          <div className="inline-block bg-white p-3 rounded-lg">
+            <QRCodeSVG value={`${window.location.origin}/portfolio/${user?.id}`} size={120} />
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-2">Scan to open portfolio</p>
+          <a
+            href={`/portfolio/${user?.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] text-primary hover:underline mt-1 inline-block"
+          >
+            Preview portfolio →
+          </a>
+        </div>
       </motion.div>
 
       {/* Monthly Excel Report */}
