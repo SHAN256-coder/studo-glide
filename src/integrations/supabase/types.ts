@@ -71,6 +71,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "applications_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "public_portfolios"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notifications: {
@@ -116,11 +123,19 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_portfolios"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
         Row: {
           address: string | null
+          bio: string | null
           blood_group: string | null
           boarding_point: string | null
           bus_number: string | null
@@ -152,6 +167,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          bio?: string | null
           blood_group?: string | null
           boarding_point?: string | null
           bus_number?: string | null
@@ -183,6 +199,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          bio?: string | null
           blood_group?: string | null
           boarding_point?: string | null
           bus_number?: string | null
@@ -234,9 +251,78 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_portfolios: {
+        Row: {
+          bio: string | null
+          cgpa: number | null
+          college: string | null
+          department: string | null
+          github_id: string | null
+          id: string | null
+          linkedin_id: string | null
+          name: string | null
+          portfolio_link: string | null
+          profile_picture: string | null
+          resume_link: string | null
+          section: string | null
+          semester: number | null
+          year: number | null
+        }
+        Insert: {
+          bio?: string | null
+          cgpa?: number | null
+          college?: string | null
+          department?: string | null
+          github_id?: string | null
+          id?: string | null
+          linkedin_id?: string | null
+          name?: string | null
+          portfolio_link?: string | null
+          profile_picture?: string | null
+          resume_link?: string | null
+          section?: string | null
+          semester?: number | null
+          year?: number | null
+        }
+        Update: {
+          bio?: string | null
+          cgpa?: number | null
+          college?: string | null
+          department?: string | null
+          github_id?: string | null
+          id?: string | null
+          linkedin_id?: string | null
+          name?: string | null
+          portfolio_link?: string | null
+          profile_picture?: string | null
+          resume_link?: string | null
+          section?: string | null
+          semester?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_public_portfolio: {
+        Args: { _user_id: string }
+        Returns: {
+          bio: string
+          cgpa: number
+          college: string
+          department: string
+          github_id: string
+          id: string
+          linkedin_id: string
+          name: string
+          portfolio_link: string
+          profile_picture: string
+          resume_link: string
+          section: string
+          semester: number
+          year: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
