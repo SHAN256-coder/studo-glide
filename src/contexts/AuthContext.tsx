@@ -91,6 +91,7 @@ function mapProfile(row: any): Profile {
     roomNumber: row.room_number,
     busNumber: row.bus_number,
     boardingPoint: row.boarding_point,
+    bio: row.bio ?? null,
   };
 }
 
