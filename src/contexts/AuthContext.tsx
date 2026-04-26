@@ -46,6 +46,8 @@ interface AuthContextType {
   signup: (email: string, password: string) => Promise<{ error: string | null }>;
   loginWithPhone: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
+  loginWithEmailOtp: (email: string) => Promise<{ error: string | null }>;
+  verifyEmailOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   isAuthenticated: boolean;
@@ -160,6 +162,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message || null };
   };
 
+  const loginWithEmailOtp = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
+    });
+    return { error: error?.message || null };
+  };
+
+  const verifyEmailOtp = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+    return { error: error?.message || null };
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
     setSession(null);
@@ -213,7 +228,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       user, session, profile, role,
-      login, signup, loginWithPhone, verifyOtp, logout,
+      login, signup, loginWithPhone, verifyOtp, loginWithEmailOtp, verifyEmailOtp, logout,
       updateProfile, isAuthenticated: !!session, loading, refreshProfile,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

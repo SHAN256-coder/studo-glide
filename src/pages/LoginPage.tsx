@@ -1,38 +1,75 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Phone, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Mail, KeyRound, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import collegeLogo from "@/assets/college-logo.png";
 
-type AuthMethod = "email" | "mobile";
+type AuthMethod = "password" | "otp";
 type EmailMode = "signin" | "signup" | "forgot";
 
+const MAX_OTP_ATTEMPTS = 3;
+const LOCKOUT_MINUTES = 15;
+const LS_KEY = "otp_lockout_v1";
+
+type LockoutState = { email: string; attempts: number; lockedUntil: number | null };
+
+function readLockout(): LockoutState | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? (JSON.parse(raw) as LockoutState) : null;
+  } catch {
+    return null;
+  }
+}
+function writeLockout(state: LockoutState | null) {
+  if (!state) localStorage.removeItem(LS_KEY);
+  else localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+
 const LoginPage = () => {
-  const [method, setMethod] = useState<AuthMethod>("email");
+  const [method, setMethod] = useState<AuthMethod>("password");
   const [mode, setMode] = useState<EmailMode>("signin");
 
-  // email state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // mobile state
-  const [phone, setPhone] = useState("");
+  // OTP state
+  const [otpEmail, setOtpEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState("");
-  const [mobileMode, setMobileMode] = useState<"signin" | "forgot">("signin");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [resetVerified, setResetVerified] = useState(false);
+  const [attemptsLeft, setAttemptsLeft] = useState(MAX_OTP_ATTEMPTS);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [now, setNow] = useState(Date.now());
 
   const [isLoading, setIsLoading] = useState(false);
-  const { login, signup, loginWithPhone, verifyOtp } = useAuth();
+  const { login, signup, loginWithEmailOtp, verifyEmailOtp } = useAuth();
+
+  // Restore lockout for the current OTP email
+  useEffect(() => {
+    const saved = readLockout();
+    if (!saved) return;
+    if (saved.email === otpEmail.trim().toLowerCase()) {
+      setAttemptsLeft(Math.max(0, MAX_OTP_ATTEMPTS - saved.attempts));
+      setLockedUntil(saved.lockedUntil);
+    }
+  }, [otpEmail]);
+
+  // Tick for lockout countdown
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [lockedUntil]);
+
+  const isLocked = !!lockedUntil && lockedUntil > now;
+  const lockoutSecondsLeft = isLocked ? Math.ceil((lockedUntil! - now) / 1000) : 0;
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,109 +117,68 @@ const LoginPage = () => {
     }
   };
 
-  const normalizeIndianMobile = (raw: string): string | null => {
-    const digits = raw.replace(/\D/g, "");
-    // Accept "9876543210" or "919876543210"
-    if (digits.length === 10) return `+91${digits}`;
-    if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
-    return null;
-  };
-
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleSendEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const normalized = normalizeIndianMobile(phone);
-    if (!normalized) {
-      toast.error("Enter a valid 10-digit mobile number.");
+    const target = otpEmail.trim().toLowerCase();
+    if (!target || !target.includes("@")) {
+      toast.error("Enter a valid email address.");
       return;
     }
-    setPhone(normalized);
+    if (isLocked) {
+      toast.error(`Too many attempts. Try again in ${lockoutSecondsLeft}s.`);
+      return;
+    }
     setIsLoading(true);
     try {
-      const { error } = await loginWithPhone(normalized);
+      const { error } = await loginWithEmailOtp(target);
       if (error) toast.error(error);
       else {
-        toast.success("OTP sent to your mobile.");
+        toast.success("OTP sent to your email.");
         setOtpSent(true);
+        // reset attempt counter for a fresh send
+        setAttemptsLeft(MAX_OTP_ATTEMPTS);
+        writeLockout({ email: target, attempts: 0, lockedUntil: null });
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
+  const handleVerifyEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    const target = otpEmail.trim().toLowerCase();
+    if (isLocked) {
+      toast.error(`Locked. Try again in ${lockoutSecondsLeft}s.`);
+      return;
+    }
     if (!otpCode.trim()) {
       toast.error("Enter the OTP code.");
       return;
     }
     setIsLoading(true);
     try {
-      const { error } = await verifyOtp(phone.trim(), otpCode.trim());
-      if (error) toast.error(error);
-      else toast.success("Login successful!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      const { error } = await verifyEmailOtp(target, otpCode.trim());
+      if (error) {
+        const saved = readLockout();
+        const prevAttempts = saved && saved.email === target ? saved.attempts : 0;
+        const newAttempts = prevAttempts + 1;
+        const remaining = Math.max(0, MAX_OTP_ATTEMPTS - newAttempts);
+        setAttemptsLeft(remaining);
 
-  const handleRequestMobileReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const normalized = normalizeIndianMobile(phone);
-    if (!normalized) {
-      toast.error("Enter a valid 10-digit mobile number.");
-      return;
-    }
-    setPhone(normalized);
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("request-mobile-reset", {
-        body: { phone: normalized },
-      });
-      if (error || (data as any)?.error) {
-        toast.error((data as any)?.error || error?.message || "Failed to send OTP.");
+        if (newAttempts >= MAX_OTP_ATTEMPTS) {
+          const lockUntil = Date.now() + LOCKOUT_MINUTES * 60 * 1000;
+          setLockedUntil(lockUntil);
+          writeLockout({ email: target, attempts: newAttempts, lockedUntil: lockUntil });
+          toast.error(`Too many wrong attempts. Locked for ${LOCKOUT_MINUTES} minutes.`);
+        } else {
+          writeLockout({ email: target, attempts: newAttempts, lockedUntil: null });
+          toast.error(`${error}. ${remaining} attempt(s) left.`);
+        }
+        setOtpCode("");
       } else {
-        toast.success("OTP sent to your mobile.");
-        setOtpSent(true);
+        toast.success("Login successful!");
+        writeLockout(null);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyResetOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpCode.trim()) {
-      toast.error("Enter the OTP code.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await verifyOtp(phone.trim(), otpCode.trim());
-      if (error) toast.error(error);
-      else {
-        toast.success("Verified! Set your new password.");
-        setResetVerified(true);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSetNewPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      toast.error("Passwords don't match.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) toast.error(error.message);
-      else toast.success("Password updated! You're signed in.");
     } finally {
       setIsLoading(false);
     }
@@ -228,23 +224,23 @@ const LoginPage = () => {
           <p className="text-muted-foreground text-xs sm:text-sm mt-1">Management System</p>
         </div>
 
-        {/* Method toggle: Email / Mobile */}
+        {/* Method toggle: Password / Email OTP */}
         <div className="flex gap-2 mb-3">
-          {(["email", "mobile"] as const).map((m) => (
+          {(["password", "otp"] as const).map((m) => (
             <button
               key={m}
-              onClick={() => { setMethod(m); setMode("signin"); setOtpSent(false); }}
+              onClick={() => { setMethod(m); setMode("signin"); setOtpSent(false); setOtpCode(""); }}
               className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all duration-300 flex items-center justify-center gap-1.5 ${
                 method === m ? "bg-primary text-primary-foreground border-primary gold-glow" : "glass-card text-muted-foreground hover:text-card-foreground"
               }`}
             >
-              {m === "email" ? <><Mail size={14} /> Email</> : <><Phone size={14} /> Mobile</>}
+              {m === "password" ? <><Mail size={14} /> Password</> : <><KeyRound size={14} /> Email OTP</>}
             </button>
           ))}
         </div>
 
-        {/* Sign In / Sign Up toggle (email only, hidden on forgot) */}
-        {method === "email" && mode !== "forgot" && (
+        {/* Sign In / Sign Up toggle (password only, hidden on forgot) */}
+        {method === "password" && mode !== "forgot" && (
           <div className="flex gap-2 mb-5">
             {(["signin", "signup"] as const).map((m) => (
               <button
@@ -260,8 +256,8 @@ const LoginPage = () => {
           </div>
         )}
 
-        {/* EMAIL: Forgot password form */}
-        {method === "email" && mode === "forgot" && (
+        {/* Forgot password form */}
+        {method === "password" && mode === "forgot" && (
           <form onSubmit={handleForgotPassword} className="glass-card p-5 space-y-4">
             <button type="button" onClick={() => setMode("signin")} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-card-foreground">
               <ArrowLeft size={14} /> Back to Sign In
@@ -289,8 +285,8 @@ const LoginPage = () => {
           </form>
         )}
 
-        {/* EMAIL: Sign in / Sign up form */}
-        {method === "email" && mode !== "forgot" && (
+        {/* Password sign in / sign up form */}
+        {method === "password" && mode !== "forgot" && (
           <form onSubmit={handleEmailAuth} className="glass-card p-5 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-card-foreground text-sm">Email</Label>
@@ -351,31 +347,23 @@ const LoginPage = () => {
           </form>
         )}
 
-        {/* MOBILE: OTP login */}
-        {method === "mobile" && mobileMode === "signin" && (
-          <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp} className="glass-card p-5 space-y-4">
+        {/* EMAIL OTP login */}
+        {method === "otp" && (
+          <form onSubmit={otpSent ? handleVerifyEmailOtp : handleSendEmailOtp} className="glass-card p-5 space-y-4">
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label className="text-card-foreground text-sm">Mobile Number</Label>
-                {!otpSent && (
-                  <button type="button" onClick={() => { setMobileMode("forgot"); setOtpSent(false); setOtpCode(""); }} className="text-xs text-primary hover:underline">
-                    Forgot mobile?
-                  </button>
-                )}
-              </div>
+              <Label className="text-card-foreground text-sm">Email Address</Label>
               <div className="relative">
-                <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="9876543210"
-                  maxLength={10}
+                  type="email"
+                  value={otpEmail}
+                  onChange={(e) => setOtpEmail(e.target.value)}
+                  placeholder="you@example.com"
                   disabled={otpSent}
                   className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
                 />
               </div>
-              <p className="text-[10px] text-muted-foreground">Indian mobile number (10 digits)</p>
+              <p className="text-[10px] text-muted-foreground">We'll email you a 6-digit code.</p>
             </div>
 
             {otpSent && (
@@ -387,114 +375,28 @@ const LoginPage = () => {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   placeholder="6-digit code"
+                  disabled={isLocked}
                   className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary tracking-widest text-center"
                 />
+                {isLocked ? (
+                  <p className="text-[11px] text-destructive">
+                    Too many wrong attempts. Try again in {Math.floor(lockoutSecondsLeft / 60)}m {lockoutSecondsLeft % 60}s.
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground">
+                    {attemptsLeft} of {MAX_OTP_ATTEMPTS} attempt(s) left.
+                  </p>
+                )}
               </div>
             )}
 
-            <Button type="submit" disabled={isLoading} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
+            <Button type="submit" disabled={isLoading || isLocked} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
               {isLoading ? "Please wait..." : otpSent ? "Verify & Sign In" : "Send OTP"}
             </Button>
 
             {otpSent && (
               <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="w-full text-xs text-muted-foreground hover:text-card-foreground">
-                Change number
-              </button>
-            )}
-          </form>
-        )}
-
-        {method === "mobile" && mobileMode === "forgot" && (
-          <form
-            onSubmit={resetVerified ? handleSetNewPassword : (otpSent ? handleVerifyResetOtp : handleRequestMobileReset)}
-            className="glass-card p-5 space-y-4"
-          >
-            <button
-              type="button"
-              onClick={() => { setMobileMode("signin"); setOtpSent(false); setOtpCode(""); setResetVerified(false); setNewPassword(""); setConfirmNewPassword(""); }}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-card-foreground"
-            >
-              <ArrowLeft size={14} /> Back to Mobile Sign In
-            </button>
-            <div>
-              <h2 className="text-card-foreground font-semibold">Reset Password via Mobile</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                {!otpSent && "Enter your registered mobile to receive an OTP."}
-                {otpSent && !resetVerified && "Enter the OTP we sent to your mobile."}
-                {resetVerified && "Set a new password for your account."}
-              </p>
-            </div>
-
-            {!resetVerified && (
-              <div className="space-y-1.5">
-                <Label className="text-card-foreground text-sm">Mobile Number</Label>
-                <div className="relative">
-                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="9876543210"
-                    maxLength={10}
-                    disabled={otpSent}
-                    className="bg-input border-border text-card-foreground placeholder:text-muted-foreground pl-9 focus:ring-primary"
-                  />
-                </div>
-              </div>
-            )}
-
-            {otpSent && !resetVerified && (
-              <div className="space-y-1.5">
-                <Label className="text-card-foreground text-sm">OTP Code</Label>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  placeholder="6-digit code"
-                  className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary tracking-widest text-center"
-                />
-              </div>
-            )}
-
-            {resetVerified && (
-              <>
-                <div className="space-y-1.5">
-                  <Label className="text-card-foreground text-sm">New Password</Label>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="At least 6 characters"
-                    className="bg-input border-border text-card-foreground focus:ring-primary"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-card-foreground text-sm">Confirm Password</Label>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={confirmNewPassword}
-                    onChange={(e) => setConfirmNewPassword(e.target.value)}
-                    placeholder="Re-enter password"
-                    className="bg-input border-border text-card-foreground focus:ring-primary"
-                  />
-                </div>
-              </>
-            )}
-
-            <Button type="submit" disabled={isLoading} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
-              {isLoading
-                ? "Please wait..."
-                : resetVerified
-                  ? "Update Password"
-                  : otpSent
-                    ? "Verify OTP"
-                    : "Send OTP"}
-            </Button>
-
-            {otpSent && !resetVerified && (
-              <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="w-full text-xs text-muted-foreground hover:text-card-foreground">
-                Change number
+                Change email
               </button>
             )}
           </form>
