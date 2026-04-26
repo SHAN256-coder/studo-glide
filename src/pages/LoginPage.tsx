@@ -164,6 +164,10 @@ const LoginPage = () => {
       toast.error(`Locked. Try again in ${lockoutSecondsLeft}s.`);
       return;
     }
+    if (otpExpired) {
+      toast.error("OTP has expired. Please request a new code.");
+      return;
+    }
     if (!otpCode.trim()) {
       toast.error("Enter the OTP code.");
       return;
