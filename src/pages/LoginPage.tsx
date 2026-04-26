@@ -15,6 +15,7 @@ type EmailMode = "signin" | "signup" | "forgot";
 
 const MAX_OTP_ATTEMPTS = 3;
 const LOCKOUT_MINUTES = 15;
+const OTP_VALIDITY_SECONDS = 300; // 5 minutes — must match Supabase OTP expiry
 const LS_KEY = "otp_lockout_v1";
 
 type LockoutState = { email: string; attempts: number; lockedUntil: number | null };
@@ -46,6 +47,7 @@ const LoginPage = () => {
   const [otpCode, setOtpCode] = useState("");
   const [attemptsLeft, setAttemptsLeft] = useState(MAX_OTP_ATTEMPTS);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(null);
   const [now, setNow] = useState(Date.now());
 
   const [isLoading, setIsLoading] = useState(false);
@@ -61,15 +63,24 @@ const LoginPage = () => {
     }
   }, [otpEmail]);
 
-  // Tick for lockout countdown
+  // Tick every second whenever lockout or OTP expiry is active
   useEffect(() => {
-    if (!lockedUntil) return;
+    if (!lockedUntil && !otpExpiresAt) return;
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
-  }, [lockedUntil]);
+  }, [lockedUntil, otpExpiresAt]);
 
   const isLocked = !!lockedUntil && lockedUntil > now;
   const lockoutSecondsLeft = isLocked ? Math.ceil((lockedUntil! - now) / 1000) : 0;
+  const otpSecondsLeft = otpExpiresAt ? Math.max(0, Math.ceil((otpExpiresAt - now) / 1000)) : 0;
+  const otpExpired = !!otpExpiresAt && otpSecondsLeft <= 0;
+
+  // Auto-invalidate the code in the UI when expiry hits
+  useEffect(() => {
+    if (otpExpired && otpSent) {
+      setOtpCode("");
+    }
+  }, [otpExpired, otpSent]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,8 +144,10 @@ const LoginPage = () => {
       const { error } = await loginWithEmailOtp(target);
       if (error) toast.error(error);
       else {
-        toast.success("OTP sent to your email.");
+        toast.success("OTP sent to your email. Valid for 5 minutes.");
         setOtpSent(true);
+        setOtpCode("");
+        setOtpExpiresAt(Date.now() + OTP_VALIDITY_SECONDS * 1000);
         // reset attempt counter for a fresh send
         setAttemptsLeft(MAX_OTP_ATTEMPTS);
         writeLockout({ email: target, attempts: 0, lockedUntil: null });
@@ -149,6 +162,10 @@ const LoginPage = () => {
     const target = otpEmail.trim().toLowerCase();
     if (isLocked) {
       toast.error(`Locked. Try again in ${lockoutSecondsLeft}s.`);
+      return;
+    }
+    if (otpExpired) {
+      toast.error("OTP has expired. Please request a new code.");
       return;
     }
     if (!otpCode.trim()) {
@@ -178,6 +195,7 @@ const LoginPage = () => {
       } else {
         toast.success("Login successful!");
         writeLockout(null);
+        setOtpExpiresAt(null);
       }
     } finally {
       setIsLoading(false);
@@ -349,7 +367,7 @@ const LoginPage = () => {
 
         {/* EMAIL OTP login */}
         {method === "otp" && (
-          <form onSubmit={otpSent ? handleVerifyEmailOtp : handleSendEmailOtp} className="glass-card p-5 space-y-4">
+          <form onSubmit={otpSent && !otpExpired ? handleVerifyEmailOtp : handleSendEmailOtp} className="glass-card p-5 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-card-foreground text-sm">Email Address</Label>
               <div className="relative">
@@ -368,19 +386,32 @@ const LoginPage = () => {
 
             {otpSent && (
               <div className="space-y-1.5">
-                <Label className="text-card-foreground text-sm">OTP Code</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-card-foreground text-sm">OTP Code</Label>
+                  {!isLocked && otpExpiresAt && (
+                    <span className={`text-[11px] font-mono tabular-nums ${otpExpired ? "text-destructive" : otpSecondsLeft <= 30 ? "text-destructive" : "text-primary"}`}>
+                      {otpExpired
+                        ? "Expired"
+                        : `Expires in ${Math.floor(otpSecondsLeft / 60)}:${String(otpSecondsLeft % 60).padStart(2, "0")}`}
+                    </span>
+                  )}
+                </div>
                 <Input
                   type="text"
                   inputMode="numeric"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   placeholder="6-digit code"
-                  disabled={isLocked}
+                  disabled={isLocked || otpExpired}
                   className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary tracking-widest text-center"
                 />
                 {isLocked ? (
                   <p className="text-[11px] text-destructive">
                     Too many wrong attempts. Try again in {Math.floor(lockoutSecondsLeft / 60)}m {lockoutSecondsLeft % 60}s.
+                  </p>
+                ) : otpExpired ? (
+                  <p className="text-[11px] text-destructive">
+                    Code expired. Click "Resend OTP" to get a new one.
                   </p>
                 ) : (
                   <p className="text-[11px] text-muted-foreground">
@@ -391,7 +422,13 @@ const LoginPage = () => {
             )}
 
             <Button type="submit" disabled={isLoading || isLocked} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
-              {isLoading ? "Please wait..." : otpSent ? "Verify & Sign In" : "Send OTP"}
+              {isLoading
+                ? "Please wait..."
+                : !otpSent
+                ? "Send OTP"
+                : otpExpired
+                ? "Resend OTP"
+                : "Verify & Sign In"}
             </Button>
 
             {otpSent && (
