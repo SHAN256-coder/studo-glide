@@ -47,6 +47,7 @@ const LoginPage = () => {
   const [otpCode, setOtpCode] = useState("");
   const [attemptsLeft, setAttemptsLeft] = useState(MAX_OTP_ATTEMPTS);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(null);
   const [now, setNow] = useState(Date.now());
 
   const [isLoading, setIsLoading] = useState(false);
