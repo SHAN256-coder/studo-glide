@@ -213,6 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (updates.roomNumber !== undefined) dbUpdates.room_number = updates.roomNumber;
     if (updates.busNumber !== undefined) dbUpdates.bus_number = updates.busNumber;
     if (updates.boardingPoint !== undefined) dbUpdates.boarding_point = updates.boardingPoint;
+    if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
 
     await supabase.from("profiles").update(dbUpdates).eq("id", session.user.id);
     await fetchProfile(session.user.id);
