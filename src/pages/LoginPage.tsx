@@ -367,7 +367,7 @@ const LoginPage = () => {
 
         {/* EMAIL OTP login */}
         {method === "otp" && (
-          <form onSubmit={otpSent ? handleVerifyEmailOtp : handleSendEmailOtp} className="glass-card p-5 space-y-4">
+          <form onSubmit={otpSent && !otpExpired ? handleVerifyEmailOtp : handleSendEmailOtp} className="glass-card p-5 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-card-foreground text-sm">Email Address</Label>
               <div className="relative">
