@@ -386,19 +386,32 @@ const LoginPage = () => {
 
             {otpSent && (
               <div className="space-y-1.5">
-                <Label className="text-card-foreground text-sm">OTP Code</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-card-foreground text-sm">OTP Code</Label>
+                  {!isLocked && otpExpiresAt && (
+                    <span className={`text-[11px] font-mono tabular-nums ${otpExpired ? "text-destructive" : otpSecondsLeft <= 30 ? "text-destructive" : "text-primary"}`}>
+                      {otpExpired
+                        ? "Expired"
+                        : `Expires in ${Math.floor(otpSecondsLeft / 60)}:${String(otpSecondsLeft % 60).padStart(2, "0")}`}
+                    </span>
+                  )}
+                </div>
                 <Input
                   type="text"
                   inputMode="numeric"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   placeholder="6-digit code"
-                  disabled={isLocked}
+                  disabled={isLocked || otpExpired}
                   className="bg-input border-border text-card-foreground placeholder:text-muted-foreground focus:ring-primary tracking-widest text-center"
                 />
                 {isLocked ? (
                   <p className="text-[11px] text-destructive">
                     Too many wrong attempts. Try again in {Math.floor(lockoutSecondsLeft / 60)}m {lockoutSecondsLeft % 60}s.
+                  </p>
+                ) : otpExpired ? (
+                  <p className="text-[11px] text-destructive">
+                    Code expired. Click "Resend OTP" to get a new one.
                   </p>
                 ) : (
                   <p className="text-[11px] text-muted-foreground">
@@ -409,7 +422,13 @@ const LoginPage = () => {
             )}
 
             <Button type="submit" disabled={isLoading || isLocked} className="w-full bg-primary text-primary-foreground hover:bg-accent font-semibold py-5">
-              {isLoading ? "Please wait..." : otpSent ? "Verify & Sign In" : "Send OTP"}
+              {isLoading
+                ? "Please wait..."
+                : !otpSent
+                ? "Send OTP"
+                : otpExpired
+                ? "Resend OTP"
+                : "Verify & Sign In"}
             </Button>
 
             {otpSent && (
