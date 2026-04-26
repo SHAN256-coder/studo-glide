@@ -46,6 +46,8 @@ interface AuthContextType {
   signup: (email: string, password: string) => Promise<{ error: string | null }>;
   loginWithPhone: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
+  loginWithEmailOtp: (email: string) => Promise<{ error: string | null }>;
+  verifyEmailOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   isAuthenticated: boolean;
