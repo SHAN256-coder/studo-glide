@@ -63,15 +63,24 @@ const LoginPage = () => {
     }
   }, [otpEmail]);
 
-  // Tick for lockout countdown
+  // Tick every second whenever lockout or OTP expiry is active
   useEffect(() => {
-    if (!lockedUntil) return;
+    if (!lockedUntil && !otpExpiresAt) return;
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
-  }, [lockedUntil]);
+  }, [lockedUntil, otpExpiresAt]);
 
   const isLocked = !!lockedUntil && lockedUntil > now;
   const lockoutSecondsLeft = isLocked ? Math.ceil((lockedUntil! - now) / 1000) : 0;
+  const otpSecondsLeft = otpExpiresAt ? Math.max(0, Math.ceil((otpExpiresAt - now) / 1000)) : 0;
+  const otpExpired = !!otpExpiresAt && otpSecondsLeft <= 0;
+
+  // Auto-invalidate the code in the UI when expiry hits
+  useEffect(() => {
+    if (otpExpired && otpSent) {
+      setOtpCode("");
+    }
+  }, [otpExpired, otpSent]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
