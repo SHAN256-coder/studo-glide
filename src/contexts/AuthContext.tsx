@@ -32,6 +32,7 @@ export interface Profile {
   roomNumber: string | null;
   busNumber: string | null;
   boardingPoint: string | null;
+  bio: string | null;
 }
 
 // Keep backward compat alias
