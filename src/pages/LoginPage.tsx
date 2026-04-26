@@ -15,6 +15,7 @@ type EmailMode = "signin" | "signup" | "forgot";
 
 const MAX_OTP_ATTEMPTS = 3;
 const LOCKOUT_MINUTES = 15;
+const OTP_VALIDITY_SECONDS = 300; // 5 minutes — must match Supabase OTP expiry
 const LS_KEY = "otp_lockout_v1";
 
 type LockoutState = { email: string; attempts: number; lockedUntil: number | null };
