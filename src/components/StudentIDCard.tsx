@@ -137,12 +137,12 @@ const StudentIDCard = ({ open, onClose }: Props) => {
               style={{ backfaceVisibility: "hidden" }}
             >
               <div className="bg-white text-black">
-                <div className="bg-[#003399] text-white p-3 flex items-center gap-3">
-                  <img src={collegeLogo} alt="Smart Campus" className="h-20 w-20 object-contain rounded bg-white p-1" />
+                <div className="bg-white text-black p-3 flex items-center gap-3 border-b-2 border-[#003399]">
+                  <img src={collegeLogo} alt="Dhaanish Chennai" className="h-20 w-auto object-contain" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold leading-tight">SMART CAMPUS OD &amp; LEAVE</p>
                     <p className="text-[11px] font-bold leading-tight">MANAGEMENT SYSTEM</p>
-                    <p className="text-[9px] opacity-90 leading-tight mt-0.5">Student Identification Card</p>
+                    <p className="text-[9px] text-gray-700 leading-tight mt-0.5">Student Identification Card</p>
                   </div>
                 </div>
 
@@ -211,7 +211,7 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                 <div className="border-t-4 border-dashed border-[#003399] my-3" />
 
                 <div className="flex items-center gap-3 pt-1">
-                  <img src={collegeLogo} alt="Smart Campus" className="h-16 w-16 object-contain rounded bg-white p-1 border border-[#003399]/20" />
+                  <img src={collegeLogo} alt="Dhaanish Chennai" className="h-14 w-auto object-contain" />
                   <div className="text-[10px] flex-1 leading-tight">
                     <p className="font-bold">SMART CAMPUS OD &amp; LEAVE</p>
                     <p className="font-bold">MANAGEMENT SYSTEM</p>
