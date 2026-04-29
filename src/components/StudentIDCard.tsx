@@ -137,8 +137,8 @@ const StudentIDCard = ({ open, onClose }: Props) => {
               style={{ backfaceVisibility: "hidden" }}
             >
               <div className="bg-white text-black">
-                <div className="bg-[#003399] text-white p-3 flex items-center gap-3">
-                  <img src={collegeLogo} alt="Smart Campus" className="h-20 w-20 object-contain rounded bg-white p-1" />
+                <div className="bg-white text-black p-3 flex items-center gap-3 border-b-2 border-[#003399]">
+                  <img src={collegeLogo} alt="Dhaanish Chennai" className="h-20 w-auto object-contain" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold leading-tight">SMART CAMPUS OD &amp; LEAVE</p>
                     <p className="text-[11px] font-bold leading-tight">MANAGEMENT SYSTEM</p>
