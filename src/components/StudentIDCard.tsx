@@ -142,7 +142,7 @@ const StudentIDCard = ({ open, onClose }: Props) => {
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold leading-tight">SMART CAMPUS OD &amp; LEAVE</p>
                     <p className="text-[11px] font-bold leading-tight">MANAGEMENT SYSTEM</p>
-                    <p className="text-[9px] opacity-90 leading-tight mt-0.5">Student Identification Card</p>
+                    <p className="text-[9px] text-gray-700 leading-tight mt-0.5">Student Identification Card</p>
                   </div>
                 </div>
 
