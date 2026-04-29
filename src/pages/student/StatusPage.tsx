@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext, ApplicationStatus, ApplicationType } from "@/contexts/AppContext";
-import { Clock, CheckCircle, XCircle } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string }> = {
   pending: { label: "Pending", className: "status-pending" },
@@ -17,7 +22,7 @@ const typeLabels: Record<ApplicationType, string> = {
 
 const StatusPage = () => {
   const { user } = useAuth();
-  const { getStudentApplications } = useAppContext();
+  const { getStudentApplications, cancelApplication } = useAppContext();
   const apps = getStudentApplications(user?.id || "");
 
   const hostellerApps = apps.filter((a) => ["od", "hostel-od"].includes(a.type) || a.reason?.toLowerCase().includes("hostel"));
@@ -37,6 +42,29 @@ const StatusPage = () => {
         <p className="text-[10px] text-muted-foreground line-clamp-1">{app.reason}</p>
         <p className="text-[9px] text-muted-foreground">{new Date(app.createdAt).toLocaleDateString()}</p>
         {app.comments && <p className="text-[9px] text-muted-foreground italic">"{app.comments}"</p>}
+        {app.status === "pending" && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="outline" className="w-full h-7 text-[10px] gap-1 mt-1 border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                <Trash2 size={11} /> Cancel
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel this application?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Your pending {typeLabels[app.type] || app.type} application will be permanently removed. This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep it</AlertDialogCancel>
+                <AlertDialogAction onClick={() => cancelApplication(app.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Yes, cancel
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </motion.div>
     );
   };
