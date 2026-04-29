@@ -35,6 +35,7 @@ interface AppContextType {
   applications: Application[];
   addApplication: (app: Omit<Application, "id" | "createdAt" | "status">) => Promise<void>;
   updateStatus: (id: string, status: ApplicationStatus, comments?: string) => Promise<void>;
+  cancelApplication: (id: string) => Promise<void>;
   getStudentApplications: (studentId: string) => Application[];
   notifications: Notification[];
   unreadCount: number;
