@@ -171,6 +171,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await fetchNotifications();
   }, [applications, fetchApplications, fetchNotifications]);
 
+  const cancelApplication = useCallback(async (id: string) => {
+    if (!session?.user) return;
+    const app = applications.find((a) => a.id === id);
+    if (!app) return;
+    if (app.status !== "pending") {
+      toast.error("Only pending applications can be cancelled");
+      return;
+    }
+    const { error } = await supabase.from("applications").delete().eq("id", id);
+    if (error) {
+      toast.error("Failed to cancel: " + error.message);
+      return;
+    }
+    await supabase.from("notifications").insert({
+      user_id: session.user.id,
+      message: `Your ${typeLabels[app.type]} application has been cancelled.`,
+      type: "info",
+    });
+    toast.success("Application cancelled", { duration: 1000, position: "top-center" });
+    await fetchApplications();
+    await fetchNotifications();
+  }, [session, applications, fetchApplications, fetchNotifications]);
+
   const getStudentApplications = useCallback(
     (studentId: string) => applications.filter((a) => a.studentId === studentId),
     [applications]
@@ -192,10 +215,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const refreshApplications = fetchApplications;
 
   const value = useMemo(() => ({
-    applications, addApplication, updateStatus, getStudentApplications,
+    applications, addApplication, updateStatus, cancelApplication, getStudentApplications,
     notifications, unreadCount, markNotificationRead, markAllRead,
     soundEnabled, toggleSound, refreshApplications,
-  }), [applications, notifications, unreadCount, soundEnabled, addApplication, updateStatus, getStudentApplications, markNotificationRead, markAllRead, toggleSound, refreshApplications]);
+  }), [applications, notifications, unreadCount, soundEnabled, addApplication, updateStatus, cancelApplication, getStudentApplications, markNotificationRead, markAllRead, toggleSound, refreshApplications]);
 
   return (
     <AppContext.Provider value={value}>
