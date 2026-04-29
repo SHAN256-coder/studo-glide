@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppProvider } from "@/contexts/AppContext";
 import LoginPage from "@/pages/LoginPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
-import PortfolioPage from "@/pages/PortfolioPage";
+
 import ProfileSetupPage from "@/pages/student/ProfileSetupPage";
 import StudentLayout from "@/layouts/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
