@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppProvider } from "@/contexts/AppContext";
 import LoginPage from "@/pages/LoginPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
-import PortfolioPage from "@/pages/PortfolioPage";
+
 import ProfileSetupPage from "@/pages/student/ProfileSetupPage";
 import StudentLayout from "@/layouts/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
@@ -57,7 +57,7 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<PublicRoute><LoginPage /></PublicRoute>} />
     <Route path="/reset-password" element={<ResetPasswordPage />} />
-    <Route path="/portfolio/:userId" element={<PortfolioPage />} />
+    
     <Route path="/setup-profile" element={<ProfileSetupGuard><ProfileSetupPage /></ProfileSetupGuard>} />
     <Route path="/dashboard" element={<ProtectedRoute role="student"><StudentLayout /></ProtectedRoute>}>
       <Route index element={<StudentDashboard />} />
