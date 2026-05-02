@@ -10,6 +10,7 @@ import { Download, FileImage } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import A4PreviewWrapper from "@/components/A4PreviewWrapper";
 
 const cellStyle: React.CSSProperties = { border: "1px solid #000", padding: "6px 10px", fontSize: "12px" };
 const boldCell: React.CSSProperties = { ...cellStyle, fontWeight: "bold" };
