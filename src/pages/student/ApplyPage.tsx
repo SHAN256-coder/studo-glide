@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import collegeLogo from "@/assets/college-logo.png";
+import A4PreviewWrapper from "@/components/A4PreviewWrapper";
 
 type FormType =
   | "od-hosteller"
@@ -641,11 +642,11 @@ const ApplyPage = () => {
       {selectedForm && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
           <h3 className="text-sm font-semibold text-card-foreground mb-2">A4 Preview</h3>
-          <div className="overflow-auto border border-border rounded-lg">
+          <A4PreviewWrapper className="border border-border rounded-lg">
             {selectedForm === "leave-hosteller" ? renderHostelLeavePreview() :
              selectedForm === "siph-od" ? renderSiphODPreview() :
              renderDefaultPreview()}
-          </div>
+          </A4PreviewWrapper>
         </motion.div>
       )}
     </div>
