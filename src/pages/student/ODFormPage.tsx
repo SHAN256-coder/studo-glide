@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import collegeLogo from "@/assets/college-logo.png";
+import A4PreviewWrapper from "@/components/A4PreviewWrapper";
 
 const ODFormPage = () => {
   const { user } = useAuth();
@@ -153,7 +154,7 @@ const ODFormPage = () => {
             <p>This form must be submitted before attending the event. Approval is subject to HOD discretion.</p>
           </div>
         </div>
-      </div>
+      </A4PreviewWrapper>
     </div>
   );
 };
