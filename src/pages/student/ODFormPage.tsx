@@ -101,7 +101,7 @@ const ODFormPage = () => {
       </div>
 
       {/* Printable Form Preview */}
-      <div className="overflow-auto">
+      <A4PreviewWrapper>
         <div ref={formRef} style={{ width: 794, fontFamily: "serif", fontSize: 13, background: "#fff", color: "#000", padding: 40 }}>
           <div style={{ textAlign: "center", marginBottom: 16 }}>
             <img src={collegeLogo} alt="College Logo" style={{ height: 60, margin: "0 auto" }} />
