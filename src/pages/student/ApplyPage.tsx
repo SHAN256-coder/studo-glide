@@ -37,7 +37,6 @@ const dayScholarForms: { id: FormType; label: string; icon: typeof Home; descrip
 
 const otherForms: { id: FormType; label: string; icon: typeof Home; description: string }[] = [
   { id: "siph-od", label: "SIPH OD", icon: Zap, description: "SIPH Research OD requisition" },
-  { id: "internship", label: "Internship Application", icon: Briefcase, description: "Internship consent & application" },
 ];
 
 const HOURS_12 = Array.from({ length: 12 }, (_, i) => String(i + 1));

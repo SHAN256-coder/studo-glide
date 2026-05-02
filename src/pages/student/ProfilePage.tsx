@@ -5,7 +5,7 @@ import { useAppContext } from "@/contexts/AppContext";
 import {
   User, Phone, BookOpen, GraduationCap, Building2, Award, Calendar,
   Edit3, Save, X, Github, Linkedin, FileText, Globe, Camera, Volume2, VolumeX,
-  Heart, MapPin, Bus, Home, UserCheck, FileSpreadsheet
+  Heart, MapPin, Bus, Home, UserCheck, FileSpreadsheet, Copy
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -101,7 +101,7 @@ const ProfilePage = () => {
 
   const fields = [
     { label: "Name", key: "name", icon: User, editable: true, type: "text" },
-    { label: "Register Number", key: "registerNumber", icon: GraduationCap, editable: false },
+    { label: "Register Number", key: "registerNumber", icon: GraduationCap, editable: true, type: "text" },
     { label: "Mobile", key: "mobile", icon: Phone, editable: true, type: "tel" },
     { label: "Department", key: "department", icon: BookOpen, editable: true, type: "select", options: DEPARTMENTS },
     { label: "Section", key: "section", icon: Building2, editable: true, type: "text" },
@@ -216,27 +216,51 @@ const ProfilePage = () => {
         </AnimatePresence>
       </div>
 
-      {/* Social / Links */}
+      {/* Social / Links — auto-save on blur, copy button always available */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="glass-card p-3 sm:p-5 space-y-3">
         <h3 className="text-base font-semibold text-card-foreground">Links & Socials</h3>
+        <p className="text-[11px] text-muted-foreground -mt-1">Paste a link — it auto-saves. Tap the copy icon to copy anytime.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {socialFields.map((sf) => (
-            <div key={sf.key} className="flex items-center gap-2">
-              <sf.icon size={16} className="text-primary flex-shrink-0" />
-              {editing ? (
+          {socialFields.map((sf) => {
+            const currentVal = (user as any)?.[sf.key] || "";
+            return (
+              <div key={sf.key} className="flex items-center gap-2">
+                <sf.icon size={16} className="text-primary flex-shrink-0" />
                 <Input
                   placeholder={sf.placeholder}
-                  value={displayVal(sf.key)}
-                  onChange={(e) => setDraft((prev) => ({ ...prev, [sf.key]: e.target.value }))}
-                  className="h-8 text-sm"
+                  defaultValue={currentVal}
+                  key={`${sf.key}-${currentVal}`}
+                  onBlur={async (e) => {
+                    const v = e.target.value.trim();
+                    if (v !== (currentVal || "")) {
+                      await updateProfile({ [sf.key]: v } as any);
+                      if (v) toast.success(`${sf.label} saved`, { duration: 1000, position: "top-center" });
+                    }
+                  }}
+                  className="h-8 text-sm flex-1"
                 />
-              ) : (
-                <span className="text-sm text-card-foreground truncate">
-                  {displayVal(sf.key) || <span className="text-muted-foreground italic">Not set</span>}
-                </span>
-              )}
-            </div>
-          ))}
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 flex-shrink-0"
+                  disabled={!currentVal}
+                  onClick={async () => {
+                    if (!currentVal) return;
+                    try {
+                      await navigator.clipboard.writeText(currentVal);
+                      toast.success(`${sf.label} link copied`, { duration: 1000, position: "top-center" });
+                    } catch {
+                      toast.error("Copy failed");
+                    }
+                  }}
+                  aria-label={`Copy ${sf.label} link`}
+                >
+                  <Copy size={14} />
+                </Button>
+              </div>
+            );
+          })}
         </div>
       </motion.div>
 
