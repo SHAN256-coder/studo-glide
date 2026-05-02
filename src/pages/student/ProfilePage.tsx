@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import IDCardMiniPreview from "@/components/IDCardMiniPreview";
 
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
@@ -271,6 +272,11 @@ const ProfilePage = () => {
           <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
         </div>
         <p className="text-[11px] text-muted-foreground mt-2">Scan to verify identity</p>
+      </motion.div>
+
+      {/* Compact ID Card preview */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.31 }}>
+        <IDCardMiniPreview />
       </motion.div>
 
       {/* Monthly Excel Report */}
