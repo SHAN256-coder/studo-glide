@@ -9,6 +9,7 @@ import { Download, FileImage, FileText } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import collegeLogo from "@/assets/college-logo.png";
+import A4PreviewWrapper from "@/components/A4PreviewWrapper";
 
 const ConsentFormPage = () => {
   const { user } = useAuth();
@@ -183,7 +184,7 @@ const ConsentFormPage = () => {
       {/* Preview of the form document */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
         <h3 className="text-base font-semibold text-card-foreground mb-3">Document Preview</h3>
-        <div className="overflow-auto rounded-lg border border-border">
+        <A4PreviewWrapper className="rounded-lg border border-border">
           <div ref={formRef} style={{ width: "794px", padding: "40px 50px", backgroundColor: "#ffffff", color: "#000000", fontFamily: "'Times New Roman', serif", fontSize: "13px", lineHeight: "1.6" }}>
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
@@ -294,7 +295,7 @@ const ConsentFormPage = () => {
               *** DHAANISH INTELLECTUAL MAESTRO***
             </p>
           </div>
-        </div>
+        </A4PreviewWrapper>
       </motion.div>
     </div>
   );

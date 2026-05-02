@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { FileImage, FileText } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import A4PreviewWrapper from "@/components/A4PreviewWrapper";
 
 const cellStyle: React.CSSProperties = { border: "1px solid #000", padding: "6px 10px", fontSize: "12px" };
 const boldCell: React.CSSProperties = { ...cellStyle, fontWeight: "bold" };
@@ -263,7 +264,7 @@ const HostelLeaveFormPage = () => {
       {/* Document Preview */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
         <h3 className="text-base font-semibold text-card-foreground mb-3">Document Preview</h3>
-        <div className="overflow-auto rounded-lg border border-border">
+        <A4PreviewWrapper className="rounded-lg border border-border">
           <div ref={formRef} style={{ width: "794px", padding: "35px 45px", backgroundColor: "#ffffff", color: "#000000", fontFamily: "'Times New Roman', serif", lineHeight: "1.5" }}>
             <LeaveFormCopy title="Hostel Students- Leave Form -1 (Department Copy)" data={formData} />
             <div style={{ borderTop: "2px dashed #999", margin: "10px 0" }} />
@@ -272,7 +273,7 @@ const HostelLeaveFormPage = () => {
             </p>
             <LeaveFormCopy title="Hostel Students- Leave Form -2 (Warden Copy)" data={formData} />
           </div>
-        </div>
+        </A4PreviewWrapper>
       </motion.div>
     </div>
   );

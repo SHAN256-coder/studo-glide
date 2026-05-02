@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import collegeLogo from "@/assets/college-logo.png";
+import A4PreviewWrapper from "@/components/A4PreviewWrapper";
 
 const ODFormPage = () => {
   const { user } = useAuth();
@@ -101,7 +102,7 @@ const ODFormPage = () => {
       </div>
 
       {/* Printable Form Preview */}
-      <div className="overflow-auto">
+      <A4PreviewWrapper>
         <div ref={formRef} style={{ width: 794, fontFamily: "serif", fontSize: 13, background: "#fff", color: "#000", padding: 40 }}>
           <div style={{ textAlign: "center", marginBottom: 16 }}>
             <img src={collegeLogo} alt="College Logo" style={{ height: 60, margin: "0 auto" }} />
@@ -153,7 +154,7 @@ const ODFormPage = () => {
             <p>This form must be submitted before attending the event. Approval is subject to HOD discretion.</p>
           </div>
         </div>
-      </div>
+      </A4PreviewWrapper>
     </div>
   );
 };
