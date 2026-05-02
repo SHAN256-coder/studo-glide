@@ -188,7 +188,7 @@ const DayScholarODFormPage = () => {
       {/* Document Preview */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
         <h3 className="text-sm sm:text-base font-semibold text-card-foreground mb-3">Document Preview</h3>
-        <div className="overflow-auto rounded-lg border border-border">
+        <A4PreviewWrapper className="rounded-lg border border-border">
           <div ref={formRef} style={{ width: "794px", padding: "35px 45px", backgroundColor: "#ffffff", color: "#000000", fontFamily: "'Times New Roman', serif", lineHeight: "1.5" }}>
             <div style={{ textAlign: "center", marginBottom: 16 }}>
               <h2 style={{ fontSize: 16, fontWeight: "bold", marginTop: 0 }}>SMART CAMPUS OD &amp; LEAVE MANAGEMENT SYSTEM</h2>
@@ -300,7 +300,7 @@ const DayScholarODFormPage = () => {
               <p>Day scholars must carry this approved form during the OD period.</p>
             </div>
           </div>
-        </div>
+        </A4PreviewWrapper>
       </motion.div>
     </div>
   );
