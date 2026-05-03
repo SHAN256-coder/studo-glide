@@ -24,7 +24,7 @@ const StudentIDCard = ({ open, onClose }: Props) => {
   if (!open || !user) return null;
 
   const isHosteller = user.studentType === "hosteller";
-  const barcodeData = `${user.name || ""}|${user.registerNumber || ""}|${user.mobile || ""}`;
+  const barcodeData = buildGateCode({ id: user.id, registerNumber: user.registerNumber });
   const batch = user.year ? `${2025 - (user.year - 1)} - ${2025 - (user.year - 1) + 4}` : "";
 
   const captureCard = async (side: "front" | "back") => {
