@@ -281,6 +281,11 @@ const ProfilePage = () => {
         <IDCardMiniPreview />
       </motion.div>
 
+      {/* Latest gate scan */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.315 }}>
+        <LatestScanCard />
+      </motion.div>
+
       {/* Monthly Excel Report */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }} className="glass-card p-4 sm:p-5">
         <div className="flex items-center gap-3 mb-3">
