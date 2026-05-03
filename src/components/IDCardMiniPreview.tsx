@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import collegeLogo from "@/assets/college-logo.png";
 import Barcode from "@/components/Barcode";
+import { buildGateCode } from "@/lib/gateCode";
 
 /**
  * Compact, non-interactive front/back preview of the Student ID card,
