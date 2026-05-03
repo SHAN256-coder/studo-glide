@@ -270,9 +270,9 @@ const ProfilePage = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-4 sm:p-5 text-center">
         <h3 className="text-sm font-semibold text-card-foreground mb-3">Identity QR</h3>
         <div className="inline-block bg-white p-3 rounded-lg">
-          <QRCodeSVG value={`STUDENT|${user?.registerNumber}|${user?.name}|${user?.department}`} size={120} />
+          <QRCodeSVG value={buildGateCode({ id: user?.id, registerNumber: user?.registerNumber })} size={120} />
         </div>
-        <p className="text-[11px] text-muted-foreground mt-2">Scan to verify identity</p>
+        <p className="text-[11px] text-muted-foreground mt-2">Scan at gate to verify approved request</p>
       </motion.div>
 
       {/* Compact ID Card preview */}
