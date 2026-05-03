@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useMemo, R
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User as SupaUser } from "@supabase/supabase-js";
 
-export type UserRole = "student" | "admin";
+export type UserRole = "student" | "admin" | "security";
 
 export interface Profile {
   id: string;
