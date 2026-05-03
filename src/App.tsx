@@ -19,6 +19,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
 import NotFound from "@/pages/NotFound";
+import SecurityScannerPage from "@/pages/security/SecurityScannerPage";
 
 const queryClient = new QueryClient();
 
