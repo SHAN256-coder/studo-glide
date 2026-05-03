@@ -48,8 +48,8 @@ const SecurityScannerPage = () => {
   const stopScanner = async () => {
     try {
       if (scannerRef.current) {
-        await scannerRef.current.stop().catch(() => {});
-        await scannerRef.current.clear().catch(() => {});
+        try { await scannerRef.current.stop(); } catch {}
+        try { scannerRef.current.clear(); } catch {}
       }
     } finally {
       scannerRef.current = null;
