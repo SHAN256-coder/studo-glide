@@ -110,6 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     if (data && data.some((r: any) => r.role === "admin")) {
       setRole("admin");
+    } else if (data && data.some((r: any) => r.role === "security")) {
+      setRole("security");
     } else {
       setRole("student");
     }
