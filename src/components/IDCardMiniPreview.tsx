@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import collegeLogo from "@/assets/college-logo.png";
 import Barcode from "@/components/Barcode";
+import { buildGateCode } from "@/lib/gateCode";
 
 /**
  * Compact, non-interactive front/back preview of the Student ID card,
@@ -16,7 +17,7 @@ const IDCardMiniPreview = () => {
   if (!user) return null;
 
   const isHosteller = user.studentType === "hosteller";
-  const barcodeData = `${user.name || ""}|${user.registerNumber || ""}|${user.mobile || ""}`;
+  const barcodeData = buildGateCode({ id: user.id, registerNumber: user.registerNumber });
   const batch = user.year ? `${2025 - (user.year - 1)} - ${2025 - (user.year - 1) + 4}` : "";
 
   // Real card width 340px → scale down on phones via CSS

@@ -19,6 +19,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
 import NotFound from "@/pages/NotFound";
+import SecurityScannerPage from "@/pages/security/SecurityScannerPage";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground animate-pulse">Loading...</p></div>;
   if (isAuthenticated) {
     if (user?.role === "admin") return <Navigate to="/admin" replace />;
+    if (user?.role === "security") return <Navigate to="/security" replace />;
     if (profile && !profile.profileCompleted) return <Navigate to="/setup-profile" replace />;
     return <Navigate to="/dashboard" replace />;
   }
@@ -70,6 +72,7 @@ const AppRoutes = () => (
       <Route path="applications" element={<AdminApplications />} />
       <Route path="analytics" element={<AnalyticsPage />} />
     </Route>
+    <Route path="/security" element={<ProtectedRoute role="security"><SecurityScannerPage /></ProtectedRoute>} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );

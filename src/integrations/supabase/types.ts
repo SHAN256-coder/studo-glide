@@ -231,6 +231,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_logs: {
+        Row: {
+          application_id: string | null
+          created_at: string
+          direction: string
+          id: string
+          notes: string | null
+          result: string
+          scanned_by: string | null
+          scanned_code: string
+          student_id: string
+        }
+        Insert: {
+          application_id?: string | null
+          created_at?: string
+          direction?: string
+          id?: string
+          notes?: string | null
+          result?: string
+          scanned_by?: string | null
+          scanned_code: string
+          student_id: string
+        }
+        Update: {
+          application_id?: string | null
+          created_at?: string
+          direction?: string
+          id?: string
+          notes?: string | null
+          result?: string
+          scanned_by?: string | null
+          scanned_code?: string
+          student_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -332,7 +368,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "security"
       application_status: "pending" | "approved" | "rejected"
       application_type:
         | "od"
@@ -470,7 +506,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "security"],
       application_status: ["pending", "approved", "rejected"],
       application_type: [
         "od",

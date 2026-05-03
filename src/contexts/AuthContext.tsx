@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useMemo, R
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User as SupaUser } from "@supabase/supabase-js";
 
-export type UserRole = "student" | "admin";
+export type UserRole = "student" | "admin" | "security";
 
 export interface Profile {
   id: string;
@@ -110,6 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     if (data && data.some((r: any) => r.role === "admin")) {
       setRole("admin");
+    } else if (data && data.some((r: any) => r.role === "security")) {
+      setRole("security");
     } else {
       setRole("student");
     }
