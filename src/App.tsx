@@ -72,6 +72,7 @@ const AppRoutes = () => (
       <Route path="applications" element={<AdminApplications />} />
       <Route path="analytics" element={<AnalyticsPage />} />
     </Route>
+    <Route path="/security" element={<ProtectedRoute role="security"><SecurityScannerPage /></ProtectedRoute>} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
