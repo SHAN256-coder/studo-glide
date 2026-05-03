@@ -48,6 +48,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground animate-pulse">Loading...</p></div>;
   if (isAuthenticated) {
     if (user?.role === "admin") return <Navigate to="/admin" replace />;
+    if (user?.role === "security") return <Navigate to="/security" replace />;
     if (profile && !profile.profileCompleted) return <Navigate to="/setup-profile" replace />;
     return <Navigate to="/dashboard" replace />;
   }
