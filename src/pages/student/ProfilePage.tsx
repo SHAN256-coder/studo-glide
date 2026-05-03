@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { QRCodeSVG } from "qrcode.react";
+import { buildGateCode } from "@/lib/gateCode";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import IDCardMiniPreview from "@/components/IDCardMiniPreview";
