@@ -5,6 +5,7 @@ import { RotateCw, X, Download, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import collegeLogo from "@/assets/college-logo.png";
 import Barcode from "@/components/Barcode";
+import { buildGateCode } from "@/lib/gateCode";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
