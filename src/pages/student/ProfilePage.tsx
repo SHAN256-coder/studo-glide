@@ -16,6 +16,7 @@ import { buildGateCode } from "@/lib/gateCode";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import IDCardMiniPreview from "@/components/IDCardMiniPreview";
+import LatestScanCard from "@/components/LatestScanCard";
 
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
