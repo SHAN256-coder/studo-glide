@@ -58,6 +58,7 @@ const StudentLayout = () => {
               <p className="text-[9px] text-muted-foreground">{currentTime.toLocaleDateString()}</p>
               <p className="text-[9px] text-muted-foreground">{currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
             </div>
+            <ThemeToggle />
             <button onClick={handleLogout} className="text-muted-foreground hover:text-destructive transition-colors p-1.5" title="Logout">
               <LogOut size={18} />
             </button>
