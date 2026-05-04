@@ -215,6 +215,7 @@ const ProfilePage = () => {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between gap-2">
         <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text flex-shrink-0">Profile</h2>
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <ThemeToggle />
           <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
             {soundEnabled ? <Volume2 size={12} /> : <VolumeX size={12} />}
             <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-[0.65] sm:scale-75" />
@@ -232,23 +233,34 @@ const ProfilePage = () => {
         </div>
       </motion.div>
 
-      {/* Avatar & Name */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 text-center relative">
-        <div className="relative w-20 h-20 mx-auto mb-3">
-          {(editing ? draft?.profilePicture : user?.profilePicture) ? (
-            <img src={(editing ? draft?.profilePicture : user?.profilePicture)!} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-primary" />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold">
-              {user?.name?.charAt(0)}
-            </div>
-          )}
-          <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
-            <Camera size={14} className="text-primary-foreground" />
-            <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
-          </label>
+      {/* Avatar & Name — square photo, bold identity */}
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 relative">
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0">
+            {(editing ? draft?.profilePicture : user?.profilePicture) ? (
+              <img
+                src={(editing ? draft?.profilePicture : user?.profilePicture)!}
+                alt="Profile"
+                className="w-full h-full rounded-lg object-cover border-2 border-primary shadow-lg"
+              />
+            ) : (
+              <div className="w-full h-full rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-3xl font-extrabold shadow-lg">
+                {user?.name?.charAt(0)}
+              </div>
+            )}
+            <label className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-md flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors shadow">
+              <Camera size={14} className="text-primary-foreground" />
+              <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
+            </label>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl sm:text-2xl font-extrabold text-card-foreground leading-tight truncate">{user?.name || "—"}</h3>
+            <p className="text-base sm:text-lg font-bold text-primary mt-0.5 truncate">{user?.registerNumber || "—"}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
+              {user?.department}{user?.year ? ` • Year ${user.year}` : ""}{user?.section ? ` • ${user.section}` : ""}
+            </p>
+          </div>
         </div>
-        <h3 className="text-lg font-bold text-card-foreground">{user?.name}</h3>
-        <p className="text-sm text-muted-foreground">{user?.registerNumber} • {user?.department}</p>
       </motion.div>
 
       {/* Details */}
