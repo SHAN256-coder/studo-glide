@@ -371,6 +371,25 @@ const ProfilePage = () => {
         <LatestScanCard />
       </motion.div>
 
+      {/* Export last 10 gate scans */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.318 }} className="glass-card p-4 sm:p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <FileText size={20} className="text-primary" />
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-card-foreground">Export Last 10 Gate Scans</h3>
+            <p className="text-xs text-muted-foreground">Download your most recent gate entry/exit records</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Button onClick={handleExportScansCSV} disabled={exportingScans} variant="outline" className="gap-2">
+            <FileSpreadsheet size={16} /> CSV
+          </Button>
+          <Button onClick={handleExportScansPDF} disabled={exportingScans} className="gap-2">
+            <FileText size={16} /> PDF
+          </Button>
+        </div>
+      </motion.div>
+
       {/* Monthly Excel Report */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }} className="glass-card p-4 sm:p-5">
         <div className="flex items-center gap-3 mb-3">
