@@ -28,6 +28,7 @@ const ProfilePage = () => {
   const apps = getStudentApplications(user?.id || "");
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ ...user });
+  const [exportingScans, setExportingScans] = useState(false);
 
   const startEdit = () => {
     setDraft({ ...user });
@@ -35,6 +36,74 @@ const ProfilePage = () => {
   };
 
   const cancelEdit = () => setEditing(false);
+
+  const fetchLast10Scans = async () => {
+    if (!user?.id) return [];
+    const { data } = await supabase
+      .from("scan_logs" as any)
+      .select("created_at, direction, result, notes, application_id")
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    return (data as any[]) || [];
+  };
+
+  const handleExportScansCSV = async () => {
+    setExportingScans(true);
+    try {
+      const scans = await fetchLast10Scans();
+      if (!scans.length) { toast.error("No gate scans yet"); return; }
+      const header = ["#", "Date/Time", "Direction", "Result", "Application ID", "Notes"];
+      const rows = scans.map((s, i) => [
+        i + 1,
+        new Date(s.created_at).toLocaleString(),
+        s.direction,
+        s.result,
+        s.application_id || "",
+        (s.notes || "").replace(/\n/g, " "),
+      ]);
+      const csv = [header, ...rows]
+        .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${user?.registerNumber || "student"}_last10_scans.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("CSV downloaded");
+    } finally { setExportingScans(false); }
+  };
+
+  const handleExportScansPDF = async () => {
+    setExportingScans(true);
+    try {
+      const scans = await fetchLast10Scans();
+      if (!scans.length) { toast.error("No gate scans yet"); return; }
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Last 10 Gate Scans", 14, 16);
+      doc.setFontSize(10);
+      doc.text(`${user?.name || ""} • ${user?.registerNumber || ""}`, 14, 23);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 29);
+      autoTable(doc, {
+        startY: 34,
+        head: [["#", "Date/Time", "Direction", "Result", "Notes"]],
+        body: scans.map((s, i) => [
+          i + 1,
+          new Date(s.created_at).toLocaleString(),
+          s.direction,
+          s.result,
+          s.notes || "",
+        ]),
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [255, 215, 0], textColor: 0 },
+      });
+      doc.save(`${user?.registerNumber || "student"}_last10_scans.pdf`);
+      toast.success("PDF downloaded");
+    } finally { setExportingScans(false); }
+  };
 
   const saveEdit = () => {
     updateProfile(draft as any);
