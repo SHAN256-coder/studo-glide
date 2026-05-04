@@ -24,13 +24,14 @@ import SecurityScannerPage from "@/pages/security/SecurityScannerPage";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ children, role }: { children: React.ReactNode; role?: string }) {
+function ProtectedRoute({ children, role, roles }: { children: React.ReactNode; role?: string; roles?: string[] }) {
   const { isAuthenticated, loading, user, profile } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground animate-pulse">Loading...</p></div>;
   if (!isAuthenticated) return <Navigate to="/" replace />;
-  if (role && user?.role !== role) return <Navigate to="/" replace />;
+  const allowed = roles ?? (role ? [role] : []);
+  if (allowed.length && !allowed.includes(user?.role || "")) return <Navigate to="/" replace />;
   // Redirect to profile setup if not completed (student only)
-  if (role === "student" && profile && !profile.profileCompleted) {
+  if (allowed.includes("student") && profile && !profile.profileCompleted) {
     return <Navigate to="/setup-profile" replace />;
   }
   return <>{children}</>;
@@ -48,7 +49,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading, user, profile } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground animate-pulse">Loading...</p></div>;
   if (isAuthenticated) {
-    if (user?.role === "admin") return <Navigate to="/admin" replace />;
+    if (user?.role === "admin" || user?.role === "faculty") return <Navigate to="/admin" replace />;
     if (user?.role === "security") return <Navigate to="/security" replace />;
     if (profile && !profile.profileCompleted) return <Navigate to="/setup-profile" replace />;
     return <Navigate to="/dashboard" replace />;
@@ -68,7 +69,7 @@ const AppRoutes = () => (
       <Route path="status" element={<StatusPage />} />
       <Route path="profile" element={<ProfilePage />} />
     </Route>
-    <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
+    <Route path="/admin" element={<ProtectedRoute roles={["admin", "faculty"]}><AdminLayout /></ProtectedRoute>}>
       <Route index element={<AdminDashboard />} />
       <Route path="applications" element={<AdminApplications />} />
       <Route path="analytics" element={<AnalyticsPage />} />
