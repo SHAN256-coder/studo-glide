@@ -7,6 +7,7 @@ import {
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import collegeLogo from "@/assets/college-logo.png";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
