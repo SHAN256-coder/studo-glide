@@ -15,8 +15,12 @@ import { QRCodeSVG } from "qrcode.react";
 import { buildGateCode } from "@/lib/gateCode";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { supabase } from "@/integrations/supabase/client";
 import IDCardMiniPreview from "@/components/IDCardMiniPreview";
 import LatestScanCard from "@/components/LatestScanCard";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
