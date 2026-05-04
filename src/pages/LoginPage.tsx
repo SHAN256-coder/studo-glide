@@ -4,16 +4,20 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Mail, ArrowLeft, GraduationCap, Shield, ShieldCheck, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import collegeLogo from "@/assets/college-logo.png";
+import ThemeToggle from "@/components/ThemeToggle";
+
+type LoginRole = "student" | "faculty" | "admin" | "security";
 
 type EmailMode = "signin" | "signup" | "forgot";
 
 const LoginPage = () => {
   const [mode, setMode] = useState<EmailMode>("signin");
+  const [loginRole, setLoginRole] = useState<LoginRole>("student");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -102,11 +106,38 @@ const LoginPage = () => {
       </div>
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="w-full max-w-md">
+        <div className="absolute top-4 right-4"><ThemeToggle /></div>
         <div className="text-center mb-6">
           <img src={collegeLogo} alt="Smart Campus" className="h-16 mx-auto mb-3 rounded" />
           <h1 className="text-xl sm:text-2xl font-display font-bold gold-gradient-text">Smart Campus OD & Leave</h1>
           <p className="text-muted-foreground text-xs sm:text-sm mt-1">Management System</p>
         </div>
+
+        {/* Role tabs */}
+        {mode !== "forgot" && (
+          <div className="grid grid-cols-4 gap-1.5 mb-4">
+            {([
+              { key: "student", label: "Student", icon: GraduationCap },
+              { key: "faculty", label: "Faculty", icon: Briefcase },
+              { key: "admin", label: "Admin", icon: Shield },
+              { key: "security", label: "Security", icon: ShieldCheck },
+            ] as const).map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setLoginRole(key)}
+                className={`flex flex-col items-center gap-1 py-2 rounded-lg border text-[11px] font-medium transition-all ${
+                  loginRole === key
+                    ? "bg-primary text-primary-foreground border-primary gold-glow"
+                    : "glass-card text-muted-foreground hover:text-card-foreground"
+                }`}
+              >
+                <Icon size={14} />
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Sign In / Sign Up toggle (hidden on forgot) */}
         {mode !== "forgot" && (

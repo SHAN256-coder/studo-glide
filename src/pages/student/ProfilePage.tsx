@@ -15,8 +15,12 @@ import { QRCodeSVG } from "qrcode.react";
 import { buildGateCode } from "@/lib/gateCode";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { supabase } from "@/integrations/supabase/client";
 import IDCardMiniPreview from "@/components/IDCardMiniPreview";
 import LatestScanCard from "@/components/LatestScanCard";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
@@ -24,6 +28,7 @@ const ProfilePage = () => {
   const apps = getStudentApplications(user?.id || "");
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ ...user });
+  const [exportingScans, setExportingScans] = useState(false);
 
   const startEdit = () => {
     setDraft({ ...user });
@@ -31,6 +36,74 @@ const ProfilePage = () => {
   };
 
   const cancelEdit = () => setEditing(false);
+
+  const fetchLast10Scans = async () => {
+    if (!user?.id) return [];
+    const { data } = await supabase
+      .from("scan_logs" as any)
+      .select("created_at, direction, result, notes, application_id")
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    return (data as any[]) || [];
+  };
+
+  const handleExportScansCSV = async () => {
+    setExportingScans(true);
+    try {
+      const scans = await fetchLast10Scans();
+      if (!scans.length) { toast.error("No gate scans yet"); return; }
+      const header = ["#", "Date/Time", "Direction", "Result", "Application ID", "Notes"];
+      const rows = scans.map((s, i) => [
+        i + 1,
+        new Date(s.created_at).toLocaleString(),
+        s.direction,
+        s.result,
+        s.application_id || "",
+        (s.notes || "").replace(/\n/g, " "),
+      ]);
+      const csv = [header, ...rows]
+        .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${user?.registerNumber || "student"}_last10_scans.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("CSV downloaded");
+    } finally { setExportingScans(false); }
+  };
+
+  const handleExportScansPDF = async () => {
+    setExportingScans(true);
+    try {
+      const scans = await fetchLast10Scans();
+      if (!scans.length) { toast.error("No gate scans yet"); return; }
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Last 10 Gate Scans", 14, 16);
+      doc.setFontSize(10);
+      doc.text(`${user?.name || ""} • ${user?.registerNumber || ""}`, 14, 23);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 29);
+      autoTable(doc, {
+        startY: 34,
+        head: [["#", "Date/Time", "Direction", "Result", "Notes"]],
+        body: scans.map((s, i) => [
+          i + 1,
+          new Date(s.created_at).toLocaleString(),
+          s.direction,
+          s.result,
+          s.notes || "",
+        ]),
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [255, 215, 0], textColor: 0 },
+      });
+      doc.save(`${user?.registerNumber || "student"}_last10_scans.pdf`);
+      toast.success("PDF downloaded");
+    } finally { setExportingScans(false); }
+  };
 
   const saveEdit = () => {
     updateProfile(draft as any);
@@ -142,6 +215,7 @@ const ProfilePage = () => {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between gap-2">
         <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text flex-shrink-0">Profile</h2>
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <ThemeToggle />
           <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
             {soundEnabled ? <Volume2 size={12} /> : <VolumeX size={12} />}
             <Switch checked={soundEnabled} onCheckedChange={toggleSound} className="scale-[0.65] sm:scale-75" />
@@ -159,23 +233,34 @@ const ProfilePage = () => {
         </div>
       </motion.div>
 
-      {/* Avatar & Name */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 text-center relative">
-        <div className="relative w-20 h-20 mx-auto mb-3">
-          {(editing ? draft?.profilePicture : user?.profilePicture) ? (
-            <img src={(editing ? draft?.profilePicture : user?.profilePicture)!} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-primary" />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold">
-              {user?.name?.charAt(0)}
-            </div>
-          )}
-          <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
-            <Camera size={14} className="text-primary-foreground" />
-            <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
-          </label>
+      {/* Avatar & Name — square photo, bold identity */}
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 relative">
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0">
+            {(editing ? draft?.profilePicture : user?.profilePicture) ? (
+              <img
+                src={(editing ? draft?.profilePicture : user?.profilePicture)!}
+                alt="Profile"
+                className="w-full h-full rounded-lg object-cover border-2 border-primary shadow-lg"
+              />
+            ) : (
+              <div className="w-full h-full rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-3xl font-extrabold shadow-lg">
+                {user?.name?.charAt(0)}
+              </div>
+            )}
+            <label className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-md flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors shadow">
+              <Camera size={14} className="text-primary-foreground" />
+              <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
+            </label>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl sm:text-2xl font-extrabold text-card-foreground leading-tight truncate">{user?.name || "—"}</h3>
+            <p className="text-base sm:text-lg font-bold text-primary mt-0.5 truncate">{user?.registerNumber || "—"}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
+              {user?.department}{user?.year ? ` • Year ${user.year}` : ""}{user?.section ? ` • ${user.section}` : ""}
+            </p>
+          </div>
         </div>
-        <h3 className="text-lg font-bold text-card-foreground">{user?.name}</h3>
-        <p className="text-sm text-muted-foreground">{user?.registerNumber} • {user?.department}</p>
       </motion.div>
 
       {/* Details */}
@@ -284,6 +369,25 @@ const ProfilePage = () => {
       {/* Latest gate scan */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.315 }}>
         <LatestScanCard />
+      </motion.div>
+
+      {/* Export last 10 gate scans */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.318 }} className="glass-card p-4 sm:p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <FileText size={20} className="text-primary" />
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-card-foreground">Export Last 10 Gate Scans</h3>
+            <p className="text-xs text-muted-foreground">Download your most recent gate entry/exit records</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Button onClick={handleExportScansCSV} disabled={exportingScans} variant="outline" className="gap-2">
+            <FileSpreadsheet size={16} /> CSV
+          </Button>
+          <Button onClick={handleExportScansPDF} disabled={exportingScans} className="gap-2">
+            <FileText size={16} /> PDF
+          </Button>
+        </div>
       </motion.div>
 
       {/* Monthly Excel Report */}
