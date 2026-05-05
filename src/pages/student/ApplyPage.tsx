@@ -273,22 +273,30 @@ const ApplyPage = () => {
     }
   };
 
-  const renderFormButton = (ft: { id: FormType; label: string; icon: typeof Home }, i: number) => (
+  const renderFormButton = (ft: { id: FormType; label: string; icon: typeof Home; description: string }, i: number) => (
     <motion.button
       key={ft.id}
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: i * 0.04 }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.96 }}
+      whileHover={{ y: -2 }}
       onClick={() => setSelectedForm(ft.id)}
-      className={`glass-card p-2.5 sm:p-3 text-left transition-all duration-200 ${
-        selectedForm === ft.id ? "border-primary gold-glow" : "hover:border-border"
+      className={`glass-card p-3 text-left transition-all duration-200 flex items-start gap-2.5 ${
+        selectedForm === ft.id ? "border-primary gold-glow ring-1 ring-primary" : "hover:border-primary/40"
       }`}
     >
-      <ft.icon size={16} className={selectedForm === ft.id ? "text-primary" : "text-muted-foreground"} />
-      <p className={`text-[11px] sm:text-xs font-medium mt-1 leading-tight ${selectedForm === ft.id ? "text-primary" : "text-card-foreground"}`}>
-        {ft.label}
-      </p>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+        selectedForm === ft.id ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+      }`}>
+        <ft.icon size={16} />
+      </div>
+      <div className="min-w-0">
+        <p className={`text-[12px] sm:text-xs font-semibold leading-tight ${selectedForm === ft.id ? "text-primary" : "text-card-foreground"}`}>
+          {ft.label}
+        </p>
+        <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-2">{ft.description}</p>
+      </div>
     </motion.button>
   );
 

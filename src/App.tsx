@@ -15,6 +15,7 @@ import StudentDashboard from "@/pages/student/StudentDashboard";
 import ApplyPage from "@/pages/student/ApplyPage";
 import StatusPage from "@/pages/student/StatusPage";
 import ProfilePage from "@/pages/student/ProfilePage";
+import SettingsPage from "@/pages/student/SettingsPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApplications from "@/pages/admin/AdminApplications";
@@ -68,6 +69,7 @@ const AppRoutes = () => (
       <Route path="apply" element={<ApplyPage />} />
       <Route path="status" element={<StatusPage />} />
       <Route path="profile" element={<ProfilePage />} />
+      <Route path="settings" element={<SettingsPage />} />
     </Route>
     <Route path="/admin" element={<ProtectedRoute roles={["admin", "faculty"]}><AdminLayout /></ProtectedRoute>}>
       <Route index element={<AdminDashboard />} />

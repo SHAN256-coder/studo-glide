@@ -233,34 +233,32 @@ const ProfilePage = () => {
         </div>
       </motion.div>
 
-      {/* Avatar & Name — square photo, bold identity */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-4 sm:p-6 relative">
-        <div className="flex items-center gap-4 sm:gap-5">
-          <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0">
+      {/* Avatar — large centered circle */}
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-6 sm:p-8 text-center">
+        <div className="relative inline-block">
+          <div className="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto">
             {(editing ? draft?.profilePicture : user?.profilePicture) ? (
               <img
                 src={(editing ? draft?.profilePicture : user?.profilePicture)!}
                 alt="Profile"
-                className="w-full h-full rounded-lg object-cover border-2 border-primary shadow-lg"
+                className="w-full h-full rounded-full object-cover border-4 border-primary shadow-xl gold-glow"
               />
             ) : (
-              <div className="w-full h-full rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-3xl font-extrabold shadow-lg">
+              <div className="w-full h-full rounded-full bg-primary flex items-center justify-center text-primary-foreground text-5xl sm:text-6xl font-extrabold shadow-xl gold-glow">
                 {user?.name?.charAt(0)}
               </div>
             )}
-            <label className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-md flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors shadow">
-              <Camera size={14} className="text-primary-foreground" />
+            <label className="absolute bottom-1 right-1 w-9 h-9 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-accent transition-colors shadow-lg border-2 border-background">
+              <Camera size={16} className="text-primary-foreground" />
               <input type="file" accept="image/*" className="hidden" onChange={handlePicture} />
             </label>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-xl sm:text-2xl font-extrabold text-card-foreground leading-tight truncate">{user?.name || "—"}</h3>
-            <p className="text-base sm:text-lg font-bold text-primary mt-0.5 truncate">{user?.registerNumber || "—"}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
-              {user?.department}{user?.year ? ` • Year ${user.year}` : ""}{user?.section ? ` • ${user.section}` : ""}
-            </p>
-          </div>
         </div>
+        <h3 className="text-2xl sm:text-3xl font-extrabold text-card-foreground mt-4 leading-tight">{user?.name || "—"}</h3>
+        <p className="text-lg sm:text-xl font-bold text-primary mt-1">{user?.registerNumber || "—"}</p>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+          {user?.department}{user?.year ? ` • Year ${user.year}` : ""}{user?.section ? ` • ${user.section}` : ""}
+        </p>
       </motion.div>
 
       {/* Details */}
