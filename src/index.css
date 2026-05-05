@@ -211,3 +211,18 @@
     opacity: 1;
   }
 }
+
+@layer utilities {
+  .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .compact .glass-card { padding: 0.65rem !important; }
+
+  /* In light (ink-blue) theme, restore default dark calendar icon */
+  .light input[type="date"]::-webkit-calendar-picker-indicator,
+  .light input[type="time"]::-webkit-calendar-picker-indicator,
+  .light input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: none;
+  }
+}
