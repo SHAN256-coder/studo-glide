@@ -308,9 +308,12 @@ const ApplyPage = () => {
     const d = hostelLeaveData;
     const renderCopy = (title: string) => (
       <div style={{ marginBottom: "30px" }}>
-        <h2 style={{ textAlign: "center", fontWeight: "bold", fontSize: "16px", margin: "0 0 2px" }}>
-          Smart Campus OD &amp; Leave Management System
-        </h2>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 6 }}>
+          <img src={collegeLogo} alt="College Logo" style={{ height: 56, width: "auto", objectFit: "contain" }} />
+          <h2 style={{ fontWeight: "bold", fontSize: "16px", margin: 0 }}>
+            Smart Campus OD &amp; Leave Management System
+          </h2>
+        </div>
         <h3 style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", margin: "0 0 12px" }}>{title}</h3>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <tbody>
