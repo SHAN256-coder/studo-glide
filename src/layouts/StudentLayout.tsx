@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTapSound } from "@/hooks/useTapSound";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, FileText, User, LogOut, ClipboardList
+  LayoutDashboard, FileText, User, LogOut, ClipboardList, Settings
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -38,6 +38,7 @@ const StudentLayout = () => {
     { to: "/dashboard/apply", icon: FileText, label: "Apply" },
     { to: "/dashboard/status", icon: ClipboardList, label: "Status" },
     { to: "/dashboard/profile", icon: User, label: "Profile" },
+    { to: "/dashboard/settings", icon: Settings, label: "Settings" },
   ];
 
   return (
