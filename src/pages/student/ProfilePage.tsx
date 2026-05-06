@@ -206,7 +206,9 @@ const ProfilePage = () => {
 
   const displayVal = (key: string) => {
     const val = editing ? (draft as any)?.[key] : (user as any)?.[key];
-    return val !== undefined && val !== null ? String(val) : "";
+    if (val === undefined || val === null || val === "") return "";
+    if (key === "studentType") return String(val).toUpperCase().replace(/_/g, " ");
+    return String(val);
   };
 
   return (
