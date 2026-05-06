@@ -692,7 +692,7 @@ const ApplyPage = () => {
               )}
             </div>
 
-            <Textarea placeholder="Reason / Remarks" value={formData.reason} onChange={(e) => set("reason", e.target.value)} />
+            <Textarea placeholder="Reason / Remarks *" value={formData.reason} onChange={(e) => set("reason", e.target.value)} />
 
             {/* Actions */}
             <div className="flex flex-wrap gap-2">
