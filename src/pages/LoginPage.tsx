@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, ArrowLeft, GraduationCap, Shield, ShieldCheck, Briefcase } from "lucide-react";
+import { Eye, EyeOff, Mail, ArrowLeft, GraduationCap, Shield, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import collegeLogo from "@/assets/college-logo.png";
 import ThemeToggle from "@/components/ThemeToggle";
 
-type LoginRole = "student" | "faculty" | "admin" | "security";
+type LoginRole = "student" | "faculty" | "admin";
 
 type EmailMode = "signin" | "signup" | "forgot";
 
