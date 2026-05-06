@@ -114,6 +114,7 @@ const ApplyPage = () => {
     ccName: "",
     siphEventName: "",
     siphVenue: "",
+    siphRoom: "",
   });
 
   const set = (k: string, v: string) => setFormData((p) => ({ ...p, [k]: v }));
