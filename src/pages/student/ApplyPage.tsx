@@ -549,11 +549,11 @@ const ApplyPage = () => {
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-1.5">
-                    <p className="text-xs font-medium text-card-foreground">From Date</p>
+                    <p className="text-xs font-medium text-card-foreground">From Date <span className="text-destructive">*</span></p>
                     <Input type="date" value={formData.fromDate} onChange={(e) => set("fromDate", e.target.value)} />
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-xs font-medium text-card-foreground">To Date</p>
+                    <p className="text-xs font-medium text-card-foreground">To Date <span className="text-destructive">*</span></p>
                     <Input type="date" value={formData.toDate} onChange={(e) => set("toDate", e.target.value)} />
                   </div>
                 </div>
