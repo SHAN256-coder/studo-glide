@@ -187,10 +187,7 @@ const ApplyPage = () => {
   };
 
   const handleSubmitApplication = () => {
-    if (!formData.name || !formData.registerNumber) {
-      toast.error("Please fill name and register number");
-      return;
-    }
+    if (!guardOrToast()) return;
     const typeMap: Record<FormType, string> = {
       "od-hosteller": "hostel-od",
       "od-dayscholar": "day-scholar-od",
