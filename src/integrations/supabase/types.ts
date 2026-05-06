@@ -80,6 +80,48 @@ export type Database = {
           },
         ]
       }
+      feedbacks: {
+        Row: {
+          category: string
+          created_at: string
+          email: string
+          id: string
+          image_url: string | null
+          message: string
+          name: string
+          rating: number
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          email: string
+          id?: string
+          image_url?: string | null
+          message: string
+          name: string
+          rating?: number
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string
+          id?: string
+          image_url?: string | null
+          message?: string
+          name?: string
+          rating?: number
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           application_id: string | null
