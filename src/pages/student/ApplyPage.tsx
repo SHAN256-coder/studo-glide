@@ -526,22 +526,22 @@ const ApplyPage = () => {
 
             {/* Common Fields - INLINE */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-              <Input placeholder="Date" type="date" value={formData.date} onChange={(e) => set("date", e.target.value)} />
-              <Input placeholder="Student Name" value={formData.name} onChange={(e) => set("name", e.target.value)} />
-              <Input placeholder="Register Number" value={formData.registerNumber} onChange={(e) => set("registerNumber", e.target.value)} />
+              <Input placeholder="Date *" type="date" value={formData.date} onChange={(e) => set("date", e.target.value)} />
+              <Input placeholder="Student Name *" value={formData.name} onChange={(e) => set("name", e.target.value)} />
+              <Input placeholder="Register Number *" value={formData.registerNumber} onChange={(e) => set("registerNumber", e.target.value)} />
               <Select value={formData.department} onValueChange={(v) => set("department", v)}>
-                <SelectTrigger><SelectValue placeholder="Department" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Department *" /></SelectTrigger>
                 <SelectContent>{DEPARTMENTS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={formData.year} onValueChange={(v) => set("year", v)}>
-                <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Year *" /></SelectTrigger>
                 <SelectContent>{YEARS.map((y) => <SelectItem key={y} value={String(y)}>Year {y}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={formData.semester} onValueChange={(v) => set("semester", v)}>
-                <SelectTrigger><SelectValue placeholder="Semester" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Semester *" /></SelectTrigger>
                 <SelectContent>{SEMESTERS.map((s) => <SelectItem key={s} value={String(s)}>Sem {s}</SelectItem>)}</SelectContent>
               </Select>
-              <Input placeholder="Section" value={formData.section} onChange={(e) => set("section", e.target.value)} />
+              <Input placeholder="Section *" value={formData.section} onChange={(e) => set("section", e.target.value)} />
             </div>
 
             {/* Date/Time fields for non-absent forms */}
