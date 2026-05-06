@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, FileImage, Home, GraduationCap, CalendarOff, Briefcase, Building2, FileText, ClipboardList, AlertCircle, Zap } from "lucide-react";
+import { Download, FileImage, Home, GraduationCap, CalendarOff, Briefcase, Building2, FileText, ClipboardList, AlertCircle, Zap, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import collegeLogo from "@/assets/college-logo.png";
 import A4PreviewWrapper from "@/components/A4PreviewWrapper";
+import FeedbackForm from "@/components/FeedbackForm";
 
 type FormType =
   | "od-hosteller"
@@ -38,6 +39,18 @@ const dayScholarForms: { id: FormType; label: string; icon: typeof Home; descrip
 
 const otherForms: { id: FormType; label: string; icon: typeof Home; description: string }[] = [
   { id: "siph-od", label: "SIPH OD", icon: Zap, description: "SIPH Research OD requisition" },
+];
+
+const SIPH_ROOMS = [
+  "Robot Room",
+  "TRIC Room",
+  "AI Room",
+  "Mastermind Room",
+  "Achievements Room",
+  "Gym",
+  "Crystal Hall",
+  "Language Room (Japanese)",
+  "Language Room (German)",
 ];
 
 const HOURS_12 = Array.from({ length: 12 }, (_, i) => String(i + 1));
