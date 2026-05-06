@@ -16,7 +16,7 @@ const Required = () => <span className="text-destructive ml-0.5">*</span>;
 const FeedbackForm = ({ onClose }: { onClose: () => void }) => {
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
+  const [email, setEmail] = useState((user as any)?.email || "");
   const [category, setCategory] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
