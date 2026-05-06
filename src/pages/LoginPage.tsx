@@ -115,12 +115,11 @@ const LoginPage = () => {
 
         {/* Role tabs */}
         {mode !== "forgot" && (
-          <div className="grid grid-cols-4 gap-1.5 mb-4">
+          <div className="grid grid-cols-3 gap-1.5 mb-4">
             {([
               { key: "student", label: "Student", icon: GraduationCap },
               { key: "faculty", label: "Faculty", icon: Briefcase },
               { key: "admin", label: "Admin", icon: Shield },
-              { key: "security", label: "Security", icon: ShieldCheck },
             ] as const).map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
