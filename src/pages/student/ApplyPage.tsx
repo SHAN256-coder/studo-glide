@@ -122,7 +122,41 @@ const ApplyPage = () => {
   const fromTime12 = `${formData.fromHour}:${formData.fromMinute} ${formData.fromAmPm}`;
   const toTime12 = `${formData.toHour}:${formData.toMinute} ${formData.toAmPm}`;
 
+  // Required-field rules per form type
+  const requiredFieldsByForm: Record<FormType, string[]> = {
+    "od-hosteller": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","eventName","venue","organizerName","facultyInCharge","hostelRoomNo","reason"],
+    "od-dayscholar": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","eventName","venue","organizerName","facultyInCharge","parentName","parentPhone","reason"],
+    "leave-hosteller": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","blockRoom","totalLeaveAvailed","ccName","reason"],
+    "leave-dayscholar": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","leaveType","parentName","parentPhone","reason"],
+    "absent-hosteller": ["date","name","registerNumber","department","year","semester","section","absentDate","hostelRoomNo","parentName","parentPhone","reason"],
+    "absent-dayscholar": ["date","name","registerNumber","department","year","semester","section","absentDate","parentName","parentPhone","reason"],
+    "industrial-visit": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","companyName","companyAddress","facultyInCharge","parentName","parentPhone","reason"],
+    "internship": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","companyName","internshipDomain","internshipDuration","companyAddress","parentName","parentPhone","reason"],
+    "siph-od": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","siphEventName","siphRoom","reason"],
+  };
+
+  const validateForm = (): string[] => {
+    if (!selectedForm) return ["No form selected"];
+    const required = requiredFieldsByForm[selectedForm] || [];
+    const missing: string[] = [];
+    required.forEach((k) => {
+      const v = (formData as any)[k];
+      if (!v || String(v).trim() === "") missing.push(k);
+    });
+    return missing;
+  };
+
+  const guardOrToast = (): boolean => {
+    const missing = validateForm();
+    if (missing.length) {
+      toast.error(`Please fill all required fields (${missing.length} missing)`);
+      return false;
+    }
+    return true;
+  };
+
   const handleSavePDF = async () => {
+    if (!guardOrToast()) return;
     if (!formRef.current) return;
     try {
       const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
@@ -138,6 +172,7 @@ const ApplyPage = () => {
   };
 
   const handleSaveJPG = async () => {
+    if (!guardOrToast()) return;
     if (!formRef.current) return;
     try {
       const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
