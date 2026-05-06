@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, FileImage, Home, GraduationCap, CalendarOff, Briefcase, Building2, FileText, ClipboardList, AlertCircle, Zap } from "lucide-react";
+import { Download, FileImage, Home, GraduationCap, CalendarOff, Briefcase, Building2, FileText, ClipboardList, AlertCircle, Zap, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import collegeLogo from "@/assets/college-logo.png";
 import A4PreviewWrapper from "@/components/A4PreviewWrapper";
+import FeedbackForm from "@/components/FeedbackForm";
 
 type FormType =
   | "od-hosteller"
@@ -40,6 +41,18 @@ const otherForms: { id: FormType; label: string; icon: typeof Home; description:
   { id: "siph-od", label: "SIPH OD", icon: Zap, description: "SIPH Research OD requisition" },
 ];
 
+const SIPH_ROOMS = [
+  "Robot Room",
+  "TRIC Room",
+  "AI Room",
+  "Mastermind Room",
+  "Achievements Room",
+  "Gym",
+  "Crystal Hall",
+  "Language Room (Japanese)",
+  "Language Room (German)",
+];
+
 const HOURS_12 = Array.from({ length: 12 }, (_, i) => String(i + 1));
 const MINUTES = ["00", "15", "30", "45"];
 const AMPM = ["AM", "PM"];
@@ -61,6 +74,7 @@ const ApplyPage = () => {
   const { addApplication } = useAppContext();
   const formRef = useRef<HTMLDivElement>(null);
   const [selectedForm, setSelectedForm] = useState<FormType | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
@@ -100,6 +114,7 @@ const ApplyPage = () => {
     ccName: "",
     siphEventName: "",
     siphVenue: "",
+    siphRoom: "",
   });
 
   const set = (k: string, v: string) => setFormData((p) => ({ ...p, [k]: v }));
@@ -107,7 +122,41 @@ const ApplyPage = () => {
   const fromTime12 = `${formData.fromHour}:${formData.fromMinute} ${formData.fromAmPm}`;
   const toTime12 = `${formData.toHour}:${formData.toMinute} ${formData.toAmPm}`;
 
+  // Required-field rules per form type
+  const requiredFieldsByForm: Record<FormType, string[]> = {
+    "od-hosteller": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","eventName","venue","organizerName","facultyInCharge","hostelRoomNo","reason"],
+    "od-dayscholar": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","eventName","venue","organizerName","facultyInCharge","parentName","parentPhone","reason"],
+    "leave-hosteller": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","blockRoom","totalLeaveAvailed","ccName","reason"],
+    "leave-dayscholar": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","leaveType","parentName","parentPhone","reason"],
+    "absent-hosteller": ["date","name","registerNumber","department","year","semester","section","absentDate","hostelRoomNo","parentName","parentPhone","reason"],
+    "absent-dayscholar": ["date","name","registerNumber","department","year","semester","section","absentDate","parentName","parentPhone","reason"],
+    "industrial-visit": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","companyName","companyAddress","facultyInCharge","parentName","parentPhone","reason"],
+    "internship": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","companyName","internshipDomain","internshipDuration","companyAddress","parentName","parentPhone","reason"],
+    "siph-od": ["date","name","registerNumber","department","year","semester","section","fromDate","toDate","siphEventName","siphRoom","reason"],
+  };
+
+  const validateForm = (): string[] => {
+    if (!selectedForm) return ["No form selected"];
+    const required = requiredFieldsByForm[selectedForm] || [];
+    const missing: string[] = [];
+    required.forEach((k) => {
+      const v = (formData as any)[k];
+      if (!v || String(v).trim() === "") missing.push(k);
+    });
+    return missing;
+  };
+
+  const guardOrToast = (): boolean => {
+    const missing = validateForm();
+    if (missing.length) {
+      toast.error(`Please fill all required fields (${missing.length} missing)`);
+      return false;
+    }
+    return true;
+  };
+
   const handleSavePDF = async () => {
+    if (!guardOrToast()) return;
     if (!formRef.current) return;
     try {
       const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
@@ -123,6 +172,7 @@ const ApplyPage = () => {
   };
 
   const handleSaveJPG = async () => {
+    if (!guardOrToast()) return;
     if (!formRef.current) return;
     try {
       const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
@@ -137,10 +187,7 @@ const ApplyPage = () => {
   };
 
   const handleSubmitApplication = () => {
-    if (!formData.name || !formData.registerNumber) {
-      toast.error("Please fill name and register number");
-      return;
-    }
+    if (!guardOrToast()) return;
     const typeMap: Record<FormType, string> = {
       "od-hosteller": "hostel-od",
       "od-dayscholar": "day-scholar-od",
@@ -265,6 +312,7 @@ const ApplyPage = () => {
           ["From Date", formData.fromDate],
           ["To Date", formData.toDate],
           ["SIPH Event Name", formData.siphEventName],
+          ["SIPH Room", formData.siphRoom],
           ["Venue", formData.siphVenue || "SIPH"],
           ["Reason", formData.reason],
         ];
@@ -424,10 +472,19 @@ const ApplyPage = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Apply</h2>
-        <p className="text-xs sm:text-sm text-muted-foreground">Select a form, fill details, and download</p>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between gap-2 flex-wrap">
+        <div>
+          <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Apply</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Select a form, fill details (<span className="text-destructive">*</span> required), and download
+          </p>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setShowFeedback((s) => !s)} className="gap-1.5">
+          <MessageSquare size={14} /> Feedback
+        </Button>
       </motion.div>
+
+      {showFeedback && <FeedbackForm onClose={() => setShowFeedback(false)} />}
 
       {/* Two-column layout: Hosteller | Day Scholar */}
       <div className="grid grid-cols-2 gap-3">
@@ -469,22 +526,22 @@ const ApplyPage = () => {
 
             {/* Common Fields - INLINE */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-              <Input placeholder="Date" type="date" value={formData.date} onChange={(e) => set("date", e.target.value)} />
-              <Input placeholder="Student Name" value={formData.name} onChange={(e) => set("name", e.target.value)} />
-              <Input placeholder="Register Number" value={formData.registerNumber} onChange={(e) => set("registerNumber", e.target.value)} />
+              <Input placeholder="Date *" type="date" value={formData.date} onChange={(e) => set("date", e.target.value)} />
+              <Input placeholder="Student Name *" value={formData.name} onChange={(e) => set("name", e.target.value)} />
+              <Input placeholder="Register Number *" value={formData.registerNumber} onChange={(e) => set("registerNumber", e.target.value)} />
               <Select value={formData.department} onValueChange={(v) => set("department", v)}>
-                <SelectTrigger><SelectValue placeholder="Department" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Department *" /></SelectTrigger>
                 <SelectContent>{DEPARTMENTS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={formData.year} onValueChange={(v) => set("year", v)}>
-                <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Year *" /></SelectTrigger>
                 <SelectContent>{YEARS.map((y) => <SelectItem key={y} value={String(y)}>Year {y}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={formData.semester} onValueChange={(v) => set("semester", v)}>
-                <SelectTrigger><SelectValue placeholder="Semester" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Semester *" /></SelectTrigger>
                 <SelectContent>{SEMESTERS.map((s) => <SelectItem key={s} value={String(s)}>Sem {s}</SelectItem>)}</SelectContent>
               </Select>
-              <Input placeholder="Section" value={formData.section} onChange={(e) => set("section", e.target.value)} />
+              <Input placeholder="Section *" value={formData.section} onChange={(e) => set("section", e.target.value)} />
             </div>
 
             {/* Date/Time fields for non-absent forms */}
@@ -492,11 +549,11 @@ const ApplyPage = () => {
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-1.5">
-                    <p className="text-xs font-medium text-card-foreground">From Date</p>
+                    <p className="text-xs font-medium text-card-foreground">From Date <span className="text-destructive">*</span></p>
                     <Input type="date" value={formData.fromDate} onChange={(e) => set("fromDate", e.target.value)} />
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-xs font-medium text-card-foreground">To Date</p>
+                    <p className="text-xs font-medium text-card-foreground">To Date <span className="text-destructive">*</span></p>
                     <Input type="date" value={formData.toDate} onChange={(e) => set("toDate", e.target.value)} />
                   </div>
                 </div>
@@ -625,13 +682,17 @@ const ApplyPage = () => {
 
               {selectedForm === "siph-od" && (
                 <>
-                  <Input placeholder="SIPH Event / Program Name" value={formData.siphEventName} onChange={(e) => set("siphEventName", e.target.value)} />
-                  <Input placeholder="Venue (e.g. SIPH)" value={formData.siphVenue} onChange={(e) => set("siphVenue", e.target.value)} />
+                  <Input placeholder="SIPH Event / Program Name *" value={formData.siphEventName} onChange={(e) => set("siphEventName", e.target.value)} />
+                  <Select value={formData.siphRoom} onValueChange={(v) => set("siphRoom", v)}>
+                    <SelectTrigger><SelectValue placeholder="SIPH Room *" /></SelectTrigger>
+                    <SelectContent>{SIPH_ROOMS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Input placeholder="Venue (optional)" value={formData.siphVenue} onChange={(e) => set("siphVenue", e.target.value)} />
                 </>
               )}
             </div>
 
-            <Textarea placeholder="Reason / Remarks" value={formData.reason} onChange={(e) => set("reason", e.target.value)} />
+            <Textarea placeholder="Reason / Remarks *" value={formData.reason} onChange={(e) => set("reason", e.target.value)} />
 
             {/* Actions */}
             <div className="flex flex-wrap gap-2">

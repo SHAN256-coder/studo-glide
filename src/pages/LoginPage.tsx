@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, ArrowLeft, GraduationCap, Shield, ShieldCheck, Briefcase } from "lucide-react";
+import { Eye, EyeOff, Mail, ArrowLeft, GraduationCap, Shield, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import collegeLogo from "@/assets/college-logo.png";
 import ThemeToggle from "@/components/ThemeToggle";
 
-type LoginRole = "student" | "faculty" | "admin" | "security";
+type LoginRole = "student" | "faculty" | "admin";
 
 type EmailMode = "signin" | "signup" | "forgot";
 
@@ -115,12 +115,11 @@ const LoginPage = () => {
 
         {/* Role tabs */}
         {mode !== "forgot" && (
-          <div className="grid grid-cols-4 gap-1.5 mb-4">
+          <div className="grid grid-cols-3 gap-1.5 mb-4">
             {([
               { key: "student", label: "Student", icon: GraduationCap },
               { key: "faculty", label: "Faculty", icon: Briefcase },
               { key: "admin", label: "Admin", icon: Shield },
-              { key: "security", label: "Security", icon: ShieldCheck },
             ] as const).map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
