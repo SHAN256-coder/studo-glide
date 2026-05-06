@@ -312,6 +312,7 @@ const ApplyPage = () => {
           ["From Date", formData.fromDate],
           ["To Date", formData.toDate],
           ["SIPH Event Name", formData.siphEventName],
+          ["SIPH Room", formData.siphRoom],
           ["Venue", formData.siphVenue || "SIPH"],
           ["Reason", formData.reason],
         ];
