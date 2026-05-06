@@ -74,6 +74,7 @@ const ApplyPage = () => {
   const { addApplication } = useAppContext();
   const formRef = useRef<HTMLDivElement>(null);
   const [selectedForm, setSelectedForm] = useState<FormType | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
