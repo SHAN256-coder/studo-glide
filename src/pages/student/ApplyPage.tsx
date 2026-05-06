@@ -681,8 +681,12 @@ const ApplyPage = () => {
 
               {selectedForm === "siph-od" && (
                 <>
-                  <Input placeholder="SIPH Event / Program Name" value={formData.siphEventName} onChange={(e) => set("siphEventName", e.target.value)} />
-                  <Input placeholder="Venue (e.g. SIPH)" value={formData.siphVenue} onChange={(e) => set("siphVenue", e.target.value)} />
+                  <Input placeholder="SIPH Event / Program Name *" value={formData.siphEventName} onChange={(e) => set("siphEventName", e.target.value)} />
+                  <Select value={formData.siphRoom} onValueChange={(v) => set("siphRoom", v)}>
+                    <SelectTrigger><SelectValue placeholder="SIPH Room *" /></SelectTrigger>
+                    <SelectContent>{SIPH_ROOMS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Input placeholder="Venue (optional)" value={formData.siphVenue} onChange={(e) => set("siphVenue", e.target.value)} />
                 </>
               )}
             </div>
