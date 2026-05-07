@@ -840,6 +840,7 @@ const ApplyPage = () => {
           <A4PreviewWrapper className="border border-border rounded-lg">
             {selectedForm === "leave-hosteller" ? renderHostelLeavePreview() :
              selectedForm === "siph-od" ? renderSiphODPreview() :
+             isODForm ? renderODLetterPreview() :
              renderDefaultPreview()}
           </A4PreviewWrapper>
         </motion.div>
