@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { ImagePlus, Send, Star, X } from "lucide-react";
 import { toast } from "sonner";
 
-const CATEGORIES = ["Bug Report", "Feature Request", "UI/UX", "Performance", "Other"];
+const CATEGORIES = ["College Issue / Inconvenience", "Bug Report", "Feature Request", "UI/UX", "Performance", "Other"];
 const Required = () => <span className="text-destructive ml-0.5">*</span>;
 
 const FeedbackForm = ({ onClose }: { onClose: () => void }) => {

@@ -18,8 +18,6 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
-import IDCardMiniPreview from "@/components/IDCardMiniPreview";
-import LatestScanCard from "@/components/LatestScanCard";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const ProfilePage = () => {
@@ -352,23 +350,15 @@ const ProfilePage = () => {
         </div>
       </motion.div>
 
-      {/* Identity QR */}
+      {/* Profile QR — used for identity verification at the gate */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-4 sm:p-5 text-center">
-        <h3 className="text-sm font-semibold text-card-foreground mb-3">Identity QR</h3>
+        <h3 className="text-sm font-semibold text-card-foreground mb-3">Profile QR</h3>
         <div className="inline-block bg-white p-3 rounded-lg">
-          <QRCodeSVG value={buildGateCode({ id: user?.id, registerNumber: user?.registerNumber })} size={120} />
+          <QRCodeSVG value={buildGateCode({ id: user?.id, registerNumber: user?.registerNumber })} size={160} />
         </div>
-        <p className="text-[11px] text-muted-foreground mt-2">Scan at gate to verify approved request</p>
-      </motion.div>
-
-      {/* Compact ID Card preview */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.31 }}>
-        <IDCardMiniPreview />
-      </motion.div>
-
-      {/* Latest gate scan */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.315 }}>
-        <LatestScanCard />
+        <p className="text-[11px] text-muted-foreground mt-2">
+          Show this QR at the gate — it identifies you and validates approved requests.
+        </p>
       </motion.div>
 
       {/* Export last 10 gate scans */}
