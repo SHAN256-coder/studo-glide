@@ -37,9 +37,8 @@ const dayScholarForms: { id: FormType; label: string; icon: typeof Home; descrip
   { id: "absent-dayscholar", label: "Absent – Day Scholar", icon: AlertCircle, description: "Absent letter for day scholars" },
 ];
 
-const otherForms: { id: FormType | "college-issue"; label: string; icon: typeof Home; description: string }[] = [
+const otherForms: { id: FormType; label: string; icon: typeof Home; description: string }[] = [
   { id: "siph-od", label: "SIPH OD", icon: Zap, description: "SIPH Research OD requisition" },
-  { id: "college-issue", label: "College Issue", icon: AlertTriangle, description: "Report issues / inconvenience inside the college" },
 ];
 
 const SIPH_ROOMS = [
