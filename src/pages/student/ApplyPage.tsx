@@ -505,8 +505,26 @@ const ApplyPage = () => {
       {/* Other forms */}
       <div>
         <p className="text-xs font-semibold text-primary mb-2">📋 Other Forms</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {otherForms.map((ft, i) => renderFormButton(ft, i))}
+          <motion.button
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.96 }}
+            whileHover={{ y: -2 }}
+            onClick={() => setShowFeedback(true)}
+            className="glass-card p-3 text-left transition-all duration-200 flex items-start gap-2.5 hover:border-primary/40"
+          >
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/10 text-primary">
+              <AlertTriangle size={16} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[12px] sm:text-xs font-semibold leading-tight text-card-foreground">College Issue</p>
+              <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-2">
+                Report issues / inconvenience inside the college
+              </p>
+            </div>
+          </motion.button>
         </div>
       </div>
 
