@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, FileImage, Home, GraduationCap, CalendarOff, Briefcase, Building2, FileText, ClipboardList, AlertCircle, Zap, MessageSquare } from "lucide-react";
+import { Download, FileImage, Home, GraduationCap, CalendarOff, Briefcase, Building2, FileText, ClipboardList, AlertCircle, Zap, MessageSquare, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -37,8 +37,9 @@ const dayScholarForms: { id: FormType; label: string; icon: typeof Home; descrip
   { id: "absent-dayscholar", label: "Absent – Day Scholar", icon: AlertCircle, description: "Absent letter for day scholars" },
 ];
 
-const otherForms: { id: FormType; label: string; icon: typeof Home; description: string }[] = [
+const otherForms: { id: FormType | "college-issue"; label: string; icon: typeof Home; description: string }[] = [
   { id: "siph-od", label: "SIPH OD", icon: Zap, description: "SIPH Research OD requisition" },
+  { id: "college-issue", label: "College Issue", icon: AlertTriangle, description: "Report issues / inconvenience inside the college" },
 ];
 
 const SIPH_ROOMS = [
