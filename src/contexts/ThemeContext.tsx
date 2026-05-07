@@ -2,7 +2,10 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 
 type Theme = "light" | "dark";
 
-export type ThemePresetKey = "default" | "ocean" | "forest" | "sunset" | "rose" | "custom";
+export type ThemePresetKey =
+  | "default" | "ocean" | "forest" | "sunset" | "rose"
+  | "violet" | "crimson" | "teal" | "amber" | "indigo" | "lime" | "magenta"
+  | "custom";
 
 export interface ThemePreset {
   key: ThemePresetKey;
@@ -15,11 +18,18 @@ export interface ThemePreset {
 }
 
 export const THEME_PRESETS: Record<Exclude<ThemePresetKey, "custom">, ThemePreset> = {
-  default: { key: "default", label: "Default · Yellow & Black", primary: "48 100% 50%", background: "0 0% 5%", card: "0 0% 8%", foreground: "0 0% 95%" },
-  ocean:   { key: "ocean",   label: "Ocean Blue",              primary: "200 95% 45%", background: "210 40% 8%", card: "210 35% 12%", foreground: "200 25% 95%" },
-  forest:  { key: "forest",  label: "Forest Green",            primary: "145 70% 42%", background: "150 25% 7%",  card: "150 20% 11%", foreground: "120 15% 95%" },
-  sunset:  { key: "sunset",  label: "Sunset Orange",           primary: "20 95% 55%",  background: "20 30% 7%",   card: "20 25% 11%",  foreground: "30 25% 95%" },
-  rose:    { key: "rose",    label: "Rose Pink",               primary: "340 85% 55%", background: "340 25% 8%",  card: "340 20% 12%", foreground: "340 15% 95%" },
+  default: { key: "default", label: "Yellow",  primary: "48 100% 50%", background: "0 0% 5%", card: "0 0% 8%", foreground: "0 0% 95%" },
+  ocean:   { key: "ocean",   label: "Ocean",   primary: "200 95% 45%", background: "210 40% 8%", card: "210 35% 12%", foreground: "200 25% 95%" },
+  forest:  { key: "forest",  label: "Forest",  primary: "145 70% 42%", background: "150 25% 7%",  card: "150 20% 11%", foreground: "120 15% 95%" },
+  sunset:  { key: "sunset",  label: "Sunset",  primary: "20 95% 55%",  background: "20 30% 7%",   card: "20 25% 11%",  foreground: "30 25% 95%" },
+  rose:    { key: "rose",    label: "Rose",    primary: "340 85% 55%", background: "340 25% 8%",  card: "340 20% 12%", foreground: "340 15% 95%" },
+  violet:  { key: "violet",  label: "Violet",  primary: "270 80% 60%", background: "270 30% 8%",  card: "270 25% 12%", foreground: "270 15% 95%" },
+  crimson: { key: "crimson", label: "Crimson", primary: "0 80% 55%",   background: "0 30% 7%",    card: "0 25% 11%",   foreground: "0 15% 95%" },
+  teal:    { key: "teal",    label: "Teal",    primary: "175 75% 42%", background: "180 30% 7%",  card: "180 25% 11%", foreground: "180 15% 95%" },
+  amber:   { key: "amber",   label: "Amber",   primary: "38 95% 55%",  background: "30 25% 7%",   card: "30 20% 11%",  foreground: "40 25% 95%" },
+  indigo:  { key: "indigo",  label: "Indigo",  primary: "230 80% 60%", background: "230 35% 8%",  card: "230 30% 12%", foreground: "230 15% 95%" },
+  lime:    { key: "lime",    label: "Lime",    primary: "85 75% 50%",  background: "90 25% 7%",   card: "90 20% 11%",  foreground: "85 15% 95%" },
+  magenta: { key: "magenta", label: "Magenta", primary: "310 85% 55%", background: "310 25% 8%",  card: "310 20% 12%", foreground: "310 15% 95%" },
 };
 
 interface ThemeContextType {
@@ -40,7 +50,9 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-const clampFont = (n: number) => Math.min(100, Math.max(1, Math.round(n)));
+// Font size is now a level 1..5 mapped to pixel sizes
+const clampFont = (n: number) => Math.min(5, Math.max(1, Math.round(n)));
+const FONT_LEVEL_PX: Record<number, number> = { 1: 14, 2: 16, 3: 18, 4: 20, 5: 22 };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -48,8 +60,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return (localStorage.getItem("theme") as Theme) || "dark";
   });
   const [fontSize, setFontSizeState] = useState<number>(() => {
-    if (typeof window === "undefined") return 20;
-    return clampFont(Number(localStorage.getItem("app-font-size")) || 20);
+    if (typeof window === "undefined") return 3;
+    const stored = Number(localStorage.getItem("app-font-size"));
+    return clampFont(stored && stored <= 5 ? stored : 3);
   });
   const [reducedMotion, setReducedMotionState] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -76,7 +89,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--app-font-size", `${fontSize}px`);
+    const px = FONT_LEVEL_PX[fontSize] || 18;
+    document.documentElement.style.setProperty("--app-font-size", `${px}px`);
     localStorage.setItem("app-font-size", String(fontSize));
   }, [fontSize]);
 
