@@ -51,19 +51,15 @@ const SettingsPage = () => {
   const { soundEnabled, toggleSound } = useAppContext();
 
   const reset = () => {
-    setFontSize(20);
+    setFontSize(3);
     setReducedMotion(false);
     setCompactMode(false);
     setThemePreset("default");
   };
 
-  const presetSwatches: { key: ThemePresetKey; label: string; color: string }[] = [
-    { key: "default", label: "Default", color: `hsl(${THEME_PRESETS.default.primary})` },
-    { key: "ocean", label: "Ocean", color: `hsl(${THEME_PRESETS.ocean.primary})` },
-    { key: "forest", label: "Forest", color: `hsl(${THEME_PRESETS.forest.primary})` },
-    { key: "sunset", label: "Sunset", color: `hsl(${THEME_PRESETS.sunset.primary})` },
-    { key: "rose", label: "Rose", color: `hsl(${THEME_PRESETS.rose.primary})` },
-  ];
+  const presetSwatches: { key: ThemePresetKey; label: string; color: string }[] = (
+    Object.keys(THEME_PRESETS) as Array<keyof typeof THEME_PRESETS>
+  ).map((k) => ({ key: k, label: THEME_PRESETS[k].label, color: `hsl(${THEME_PRESETS[k].primary})` }));
 
   return (
     <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6 max-w-2xl">
@@ -102,17 +98,17 @@ const SettingsPage = () => {
           <Palette size={18} className="text-primary" />
           <h3 className="font-semibold text-card-foreground">Color Theme</h3>
         </div>
-        <p className="text-[11px] text-muted-foreground -mt-2">Pick one of 5 presets, or build your own (6th).</p>
+        <p className="text-[11px] text-muted-foreground -mt-2">Pick one of 12 presets, or build your own.</p>
 
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
           {presetSwatches.map((s) => (
             <button
               key={s.key}
               onClick={() => setThemePreset(s.key)}
               className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all ${themePreset === s.key ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
             >
-              <span className="w-8 h-8 rounded-full border border-border" style={{ background: s.color }} />
-              <span className="text-[10px] font-medium">{s.label}</span>
+              <span className="w-7 h-7 rounded-full border border-border" style={{ background: s.color }} />
+              <span className="text-[10px] font-medium truncate max-w-full">{s.label}</span>
             </button>
           ))}
         </div>
@@ -141,27 +137,27 @@ const SettingsPage = () => {
         </div>
       </motion.div>
 
-      {/* Font Size — slider 1..100 only */}
+      {/* Font Size — slider 1..5 */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 sm:p-5 space-y-4">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Type size={18} className="text-primary" />
             <h3 className="font-semibold text-card-foreground">Font Size</h3>
           </div>
-          <span className="text-sm font-mono font-bold text-primary">{fontSize}</span>
+          <span className="text-sm font-mono font-bold text-primary">Level {fontSize}</span>
         </div>
         <Slider
           value={[fontSize]}
           min={1}
-          max={100}
+          max={5}
           step={1}
           onValueChange={(v) => setFontSize(v[0])}
         />
         <div className="flex justify-between text-[10px] text-muted-foreground">
-          <span>1</span><span>50</span><span>100</span>
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
         </div>
-        <p style={{ fontSize: `${fontSize}px` }} className="text-card-foreground border-t border-border pt-3 leading-tight">
-          Aa — Preview
+        <p className="text-card-foreground border-t border-border pt-3 leading-tight">
+          Aa — Preview at level {fontSize}
         </p>
       </motion.div>
 
