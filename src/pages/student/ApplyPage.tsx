@@ -441,6 +441,111 @@ const ApplyPage = () => {
     </div>
   );
 
+  const isODForm = selectedForm === "od-hosteller" || selectedForm === "od-dayscholar";
+
+  const renderODLetterPreview = () => {
+    const refNo = `CF/OD/${new Date().getFullYear()}/${(formData.registerNumber || "XXXX").slice(-4)}`;
+    const niceDate = formData.date ? new Date(formData.date).toLocaleDateString("en-GB") : "_______________";
+    const dateRange = formData.fromDate && formData.toDate
+      ? `${new Date(formData.fromDate).toLocaleDateString("en-GB")} to ${new Date(formData.toDate).toLocaleDateString("en-GB")}`
+      : "_______________";
+    const timeRange = `${fromTime12} – ${toTime12}`;
+    const row = (label: string, value: string) => (
+      <tr>
+        <td style={{ padding: "8px 12px", fontWeight: 600, color: "#334155", width: "38%", borderBottom: "1px solid #e5e7eb" }}>{label}</td>
+        <td style={{ padding: "8px 12px", color: "#0f172a", borderBottom: "1px solid #e5e7eb" }}>: {value || "_______________________________"}</td>
+      </tr>
+    );
+    return (
+      <div ref={formRef} style={{ width: 794, padding: "40px 50px", background: "#fff", color: "#0f172a", fontFamily: "'Helvetica', 'Arial', sans-serif", fontSize: 13, lineHeight: 1.55 }}>
+        {/* HEADER */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+          <img src={collegeLogo} alt="Campus Flow Logo" style={{ height: 60, width: "auto", objectFit: "contain" }} />
+          <div style={{ textAlign: "center", flex: 1 }}>
+            <p style={{ margin: 0, fontSize: 22, fontWeight: 800, letterSpacing: 2, color: "#1e3a8a" }}>CAMPUS FLOW</p>
+            <p style={{ margin: 0, fontSize: 12, color: "#64748b", letterSpacing: 1 }}>Smart OD Management System</p>
+          </div>
+          <div style={{ textAlign: "right", fontSize: 12, color: "#334155", minWidth: 160 }}>
+            <p style={{ margin: 0 }}>Date: <strong>{niceDate}</strong></p>
+            <p style={{ margin: 0 }}>Ref No: <strong>{refNo}</strong></p>
+          </div>
+        </div>
+        <hr style={{ border: 0, borderTop: "1px solid #cbd5e1", margin: "14px 0 18px" }} />
+
+        {/* TITLE */}
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1e293b", letterSpacing: 1 }}>ON-DUTY APPLICATION FORM</h1>
+          <p style={{ margin: "4px 0 0", fontSize: 11, color: "#64748b", fontStyle: "italic" }}>
+            For Academic, Technical, Workshop, Symposium &amp; SIPH Activities
+          </p>
+        </div>
+
+        {/* TO SECTION */}
+        <div style={{ marginBottom: 18, fontSize: 13 }}>
+          <p style={{ margin: 0 }}>To,</p>
+          <p style={{ margin: 0 }}>The Head of the Department,</p>
+          <p style={{ margin: 0 }}>The Class Coordinators,</p>
+          <p style={{ margin: 0 }}>The SIPH Head</p>
+          <p style={{ margin: "4px 0 0", color: "#64748b" }}>{formData.department || "_______________________________"}</p>
+          <p style={{ margin: 0, color: "#64748b" }}>_______________________________</p>
+        </div>
+
+        {/* STUDENT DETAILS CARD */}
+        <div style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 4px", marginBottom: 18 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {row("Student Name", formData.name)}
+              {row("Register Number", formData.registerNumber)}
+              {row("Department", formData.department)}
+              {row("Year / Semester", `${formData.year || "—"} / ${formData.semester || "—"}`)}
+              {row("Section", formData.section)}
+              {row("Mobile Number", (user as any)?.mobile || "")}
+              {row("Event / Activity", formData.eventName)}
+              {row("Organization / Venue", formData.venue || formData.organizerName)}
+              {row("OD Date(s)", dateRange)}
+              {row("Time Duration", timeRange)}
+              {row("Faculty In-charge", formData.facultyInCharge)}
+            </tbody>
+          </table>
+        </div>
+
+        {/* APPLICATION CONTENT */}
+        <div style={{ marginBottom: 18 }}>
+          <p style={{ margin: "0 0 6px", fontWeight: 700 }}>Subject: Request for On-Duty Permission</p>
+          <p style={{ margin: "10px 0 0" }}>Respected Sir/Madam,</p>
+          <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+            I kindly request permission to grant me On-Duty (OD) for participating in the above-mentioned academic/technical activity.
+          </p>
+          <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+            The event/activity will help enhance my technical knowledge, practical exposure, teamwork, communication skills, and learning experience.
+          </p>
+          <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+            I assure you that I will complete all academic responsibilities and assignments related to the missed classes during the OD period.
+          </p>
+          <p style={{ margin: "10px 0 0" }}>Kindly approve my request.</p>
+          <p style={{ margin: "16px 0 0" }}>Thanking you,</p>
+          <p style={{ margin: "2px 0 0" }}>Yours faithfully,</p>
+          <p style={{ margin: "6px 0 0", fontWeight: 700 }}>{formData.name || "_______________________________"}</p>
+        </div>
+
+        {/* SIGNATURES */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 40, fontSize: 11, textAlign: "center" }}>
+          {["Student Signature", "Faculty In-charge", "SIPH Head Signature", "HOD Approval"].map((s) => (
+            <div key={s}>
+              <div style={{ borderTop: "1px solid #94a3b8", marginBottom: 6, marginTop: 30 }} />
+              <p style={{ margin: 0, fontWeight: 600, color: "#334155" }}>{s}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* FOOTER */}
+        <p style={{ marginTop: 28, paddingTop: 10, borderTop: "1px solid #e2e8f0", textAlign: "center", fontSize: 10, color: "#94a3b8" }}>
+          Generated via Campus Flow – Smart OD Management System
+        </p>
+      </div>
+    );
+  };
+
   const renderDefaultPreview = () => (
     <div ref={formRef} style={{ width: 794, fontFamily: "serif", fontSize: 13, background: "#fff", color: "#000", padding: 40 }}>
       <div style={{ textAlign: "center", marginBottom: 16 }}>
