@@ -43,6 +43,7 @@ const otherForms: { id: FormType; label: string; icon: typeof Home; description:
 
 const SIPH_ROOMS = [
   "Robot Room",
+  "Robotics Room",
   "TRIC Room",
   "AI Room",
   "Mastermind Room",
