@@ -420,16 +420,25 @@ const ApplyPage = () => {
       <div style={{ fontSize: 14 }}>
         <p>Respected Sir/Madam,</p>
         <p style={{ marginTop: 15 }}>
-          I, <strong>{formData.name}</strong>, bearing Register Number <strong>{formData.registerNumber}</strong>,
-          a student of <strong>{formData.year ? `${formData.year} Year` : ""}</strong>,
-          Department of <strong>{formData.department}</strong>, hereby submit this request for your kind approval.
+          I, <strong>{formData.name || "_______________"}</strong>, bearing Register Number <strong>{formData.registerNumber || "_______________"}</strong>,
+          a student of <strong>{formData.year ? `${formData.year} Year` : "____ Year"}</strong>,
+          <strong> Semester {formData.semester || "__"}</strong>, Section <strong>{formData.section || "__"}</strong>,
+          Department of <strong>{formData.department || "_______________"}</strong>, hereby submit this request for your kind approval.
         </p>
         <p style={{ marginTop: 15 }}>
-          I am participating in the <strong>{formData.siphEventName || "SIPH Preparation"}</strong> event at {formData.siphVenue || "SIPH"}.
+          I am participating in the <strong>{formData.siphEventName || "_______________"}</strong> event
+          {formData.siphRoom ? <> at the <strong>{formData.siphRoom}</strong></> : null}
+          {formData.siphVenue ? <>, Venue: <strong>{formData.siphVenue}</strong></> : null}.
           In this connection, I request you to kindly grant me On-Duty (OD) permission from{" "}
           <strong>{formData.fromDate ? new Date(formData.fromDate).toLocaleDateString("en-GB") : "___"}</strong> to{" "}
-          <strong>{formData.toDate ? new Date(formData.toDate).toLocaleDateString("en-GB") : "___"}</strong>.
+          <strong>{formData.toDate ? new Date(formData.toDate).toLocaleDateString("en-GB") : "___"}</strong>
+          {` (${fromTime12} – ${toTime12})`}.
         </p>
+        {formData.reason && (
+          <p style={{ marginTop: 15 }}>
+            <strong>Reason / Remarks:</strong> {formData.reason}
+          </p>
+        )}
         <p style={{ marginTop: 15 }}>
           I assure you that I will be diligent in completing any academic requirements or classes missed during this period.
         </p>
