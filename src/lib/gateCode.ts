@@ -37,11 +37,11 @@ export function buildGateCode(opts: {
 export function parseGateCode(raw: string): { id: string | null; registerNumber: string | null } | null {
   if (!raw) return null;
   const v = raw.trim();
-  if (!v.toUpperCase().startsWith(PREFIX)) return null;
-  const parts = v.split(":");
-  // SCAMPUS : <id> : <reg>
+  if (!v.toUpperCase().includes(PREFIX)) return null;
+  const regMatch = v.match(/REGISTER NO:\s*([^\n]+)/i);
+  const idMatch = v.match(/ID:\s*([^\n]+)/i);
   return {
-    id: parts[1] || null,
-    registerNumber: parts[2] || null,
+    id: idMatch ? idMatch[1].trim() : null,
+    registerNumber: regMatch ? regMatch[1].trim() : null,
   };
 }
