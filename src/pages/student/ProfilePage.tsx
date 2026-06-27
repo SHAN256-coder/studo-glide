@@ -74,40 +74,12 @@ const ProfilePage = () => {
     } finally { setExportingScans(false); }
   };
 
-  const handleExportScansPDF = async () => {
-    setExportingScans(true);
-    try {
-      const scans = await fetchLast10Scans();
-      if (!scans.length) { toast.error("No gate scans yet"); return; }
-      const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text("Last 10 Gate Scans", 14, 16);
-      doc.setFontSize(10);
-      doc.text(`${user?.name || ""} • ${user?.registerNumber || ""}`, 14, 23);
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 29);
-      autoTable(doc, {
-        startY: 34,
-        head: [["#", "Date/Time", "Direction", "Result", "Notes"]],
-        body: scans.map((s, i) => [
-          i + 1,
-          new Date(s.created_at).toLocaleString(),
-          s.direction,
-          s.result,
-          s.notes || "",
-        ]),
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [255, 215, 0], textColor: 0 },
-      });
-      doc.save(`${user?.registerNumber || "student"}_last10_scans.pdf`);
-      toast.success("PDF downloaded");
-    } finally { setExportingScans(false); }
-  };
-
   const saveEdit = () => {
     updateProfile(draft as any);
     setEditing(false);
     toast.success("Profile updated!");
   };
+
 
   const handleExportYearlyExcel = () => {
     const year = new Date().getFullYear();
@@ -354,31 +326,36 @@ const ProfilePage = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-4 sm:p-5 text-center">
         <h3 className="text-sm font-semibold text-card-foreground mb-3">Profile QR</h3>
         <div className="inline-block bg-white p-3 rounded-lg">
-          <QRCodeSVG value={buildGateCode({ id: user?.id, registerNumber: user?.registerNumber })} size={160} />
+          <QRCodeSVG
+            value={buildGateCode({
+              id: user?.id,
+              registerNumber: user?.registerNumber,
+              name: user?.name,
+              department: user?.department,
+              section: user?.section,
+            })}
+            size={160}
+          />
         </div>
         <p className="text-[11px] text-muted-foreground mt-2">
-          Show this QR at the gate — it identifies you and validates approved requests.
+          When scanned, this QR reveals your Name, Register Number, Department and Section.
         </p>
       </motion.div>
 
-      {/* Export last 10 gate scans */}
+      {/* Export last 10 gate scans (CSV only) */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.318 }} className="glass-card p-4 sm:p-5">
         <div className="flex items-center gap-3 mb-3">
           <FileText size={20} className="text-primary" />
           <div className="flex-1">
             <h3 className="text-base font-semibold text-card-foreground">Export Last 10 Gate Scans</h3>
-            <p className="text-xs text-muted-foreground">Download your most recent gate entry/exit records</p>
+            <p className="text-xs text-muted-foreground">Download your most recent gate entry/exit records as CSV</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <Button onClick={handleExportScansCSV} disabled={exportingScans} variant="outline" className="gap-2">
-            <FileSpreadsheet size={16} /> CSV
-          </Button>
-          <Button onClick={handleExportScansPDF} disabled={exportingScans} className="gap-2">
-            <FileText size={16} /> PDF
-          </Button>
-        </div>
+        <Button onClick={handleExportScansCSV} disabled={exportingScans} variant="outline" className="w-full gap-2">
+          <FileSpreadsheet size={16} /> Download CSV
+        </Button>
       </motion.div>
+
 
       {/* Monthly Excel Report */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }} className="glass-card p-4 sm:p-5">
