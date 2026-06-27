@@ -74,40 +74,12 @@ const ProfilePage = () => {
     } finally { setExportingScans(false); }
   };
 
-  const handleExportScansPDF = async () => {
-    setExportingScans(true);
-    try {
-      const scans = await fetchLast10Scans();
-      if (!scans.length) { toast.error("No gate scans yet"); return; }
-      const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text("Last 10 Gate Scans", 14, 16);
-      doc.setFontSize(10);
-      doc.text(`${user?.name || ""} • ${user?.registerNumber || ""}`, 14, 23);
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 29);
-      autoTable(doc, {
-        startY: 34,
-        head: [["#", "Date/Time", "Direction", "Result", "Notes"]],
-        body: scans.map((s, i) => [
-          i + 1,
-          new Date(s.created_at).toLocaleString(),
-          s.direction,
-          s.result,
-          s.notes || "",
-        ]),
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [255, 215, 0], textColor: 0 },
-      });
-      doc.save(`${user?.registerNumber || "student"}_last10_scans.pdf`);
-      toast.success("PDF downloaded");
-    } finally { setExportingScans(false); }
-  };
-
   const saveEdit = () => {
     updateProfile(draft as any);
     setEditing(false);
     toast.success("Profile updated!");
   };
+
 
   const handleExportYearlyExcel = () => {
     const year = new Date().getFullYear();
