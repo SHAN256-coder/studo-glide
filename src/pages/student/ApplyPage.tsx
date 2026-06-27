@@ -595,7 +595,7 @@ const ApplyPage = () => {
           </p>
         </div>
         <Button size="sm" variant="outline" onClick={() => setShowFeedback((s) => !s)} className="gap-1.5">
-          <MessageSquare size={14} /> Feedback
+          <AlertTriangle size={14} /> Report Issue
         </Button>
       </motion.div>
 
