@@ -603,6 +603,149 @@ const ApplyPage = () => {
     );
   };
 
+  const renderFormalLetterPreview = () => {
+    const kind = selectedForm as
+      | "leave-dayscholar" | "absent-hosteller" | "absent-dayscholar";
+    const isAbsent = kind === "absent-hosteller" || kind === "absent-dayscholar";
+    const isHosteller = kind === "absent-hosteller";
+    const title = isAbsent ? "ABSENT LETTER" : "LEAVE APPLICATION";
+    const refPrefix = isAbsent ? "ABS" : "LV";
+    const refNo = `CF/${refPrefix}/${new Date().getFullYear()}/${(formData.registerNumber || "XXXX").slice(-4)}`;
+    const niceDate = formData.date ? new Date(formData.date).toLocaleDateString("en-GB") : "_______________";
+    const absentDate = formData.absentDate ? new Date(formData.absentDate).toLocaleDateString("en-GB") : "_______________";
+    const dateRange = formData.fromDate && formData.toDate
+      ? `${new Date(formData.fromDate).toLocaleDateString("en-GB")} to ${new Date(formData.toDate).toLocaleDateString("en-GB")}`
+      : "_______________";
+
+    const subject = isAbsent
+      ? `Letter of Absence – ${absentDate}`
+      : `Request for ${formData.leaveType || "Leave"} from ${dateRange}`;
+
+    const body = isAbsent ? (
+      <>
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          I respectfully inform you that I was unable to attend college on <strong>{absentDate}</strong> due to
+          <strong> {formData.reason || "the reason stated below"}</strong>.
+        </p>
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          My parent/guardian <strong>{formData.parentName || "_______________"}</strong> (Mobile: <strong>{formData.parentPhone || "_______________"}</strong>) is aware of my absence.
+        </p>
+        {isHosteller && (
+          <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+            I reside at hostel <strong>Room No. {formData.hostelRoomNo || "_______________"}</strong>.
+          </p>
+        )}
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          Kindly consider this letter as an intimation for my absence and grant me the necessary excuse. I assure you that I will complete all missed academic work at the earliest.
+        </p>
+      </>
+    ) : (
+      <>
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          I kindly request you to grant me <strong>{formData.leaveType || "leave"}</strong> from <strong>{dateRange}</strong> for the reason mentioned below.
+        </p>
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          <strong>Reason:</strong> {formData.reason || "_______________"}
+        </p>
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          My parent/guardian <strong>{formData.parentName || "_______________"}</strong> (Mobile: <strong>{formData.parentPhone || "_______________"}</strong>) is aware of and consents to this leave.
+        </p>
+        <p style={{ margin: "10px 0 0", textAlign: "justify" }}>
+          I assure you that I will complete all pending academic responsibilities and assignments during the missed period.
+        </p>
+      </>
+    );
+
+    const row = (label: string, value: string) => (
+      <tr>
+        <td style={{ padding: "6px 10px", fontWeight: 600, color: "#334155", width: "38%", borderBottom: "1px solid #e5e7eb" }}>{label}</td>
+        <td style={{ padding: "6px 10px", color: "#0f172a", borderBottom: "1px solid #e5e7eb" }}>: {value || "_______________"}</td>
+      </tr>
+    );
+
+    return (
+      <div ref={formRef} style={{ width: 794, padding: "40px 50px", background: "#fff", color: "#0f172a", fontFamily: "'Helvetica', 'Arial', sans-serif", fontSize: 13, lineHeight: 1.55 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+          <img src={collegeLogo} alt="Logo" style={{ height: 60, width: "auto", objectFit: "contain" }} />
+          <div style={{ textAlign: "center", flex: 1 }}>
+            <p style={{ margin: 0, fontSize: 22, fontWeight: 800, letterSpacing: 2, color: "#1e3a8a" }}>CAMPUS FLOW</p>
+            <p style={{ margin: 0, fontSize: 12, color: "#64748b", letterSpacing: 1 }}>Smart Campus OD &amp; Leave Management System</p>
+          </div>
+          <div style={{ textAlign: "right", fontSize: 12, color: "#334155", minWidth: 160 }}>
+            <p style={{ margin: 0 }}>Date: <strong>{niceDate}</strong></p>
+            <p style={{ margin: 0 }}>Ref: <strong>{refNo}</strong></p>
+          </div>
+        </div>
+        <hr style={{ border: 0, borderTop: "1px solid #cbd5e1", margin: "14px 0 18px" }} />
+        <div style={{ textAlign: "center", marginBottom: 18 }}>
+          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1e293b", letterSpacing: 1 }}>
+            {title} – {isHosteller ? "HOSTELLER" : kind === "absent-dayscholar" ? "DAY SCHOLAR" : "DAY SCHOLAR"}
+          </h1>
+        </div>
+
+        {/* From */}
+        <div style={{ marginBottom: 14, fontSize: 13 }}>
+          <p style={{ margin: 0, fontWeight: 700 }}>From,</p>
+          <p style={{ margin: 0 }}>{formData.name || "_______________"}</p>
+          <p style={{ margin: 0, color: "#64748b" }}>Reg. No: {formData.registerNumber || "_______________"}</p>
+          <p style={{ margin: 0, color: "#64748b" }}>{formData.department || ""} – Year {formData.year || "_"} / Sem {formData.semester || "_"} / Section {formData.section || "_"}</p>
+        </div>
+
+        {/* To */}
+        <div style={{ marginBottom: 14, fontSize: 13 }}>
+          <p style={{ margin: 0, fontWeight: 700 }}>To,</p>
+          <p style={{ margin: 0 }}>The Head of the Department,</p>
+          <p style={{ margin: 0 }}>{formData.department || "_______________"}</p>
+          <p style={{ margin: 0 }}>The Class Coordinator{isHosteller ? " & Hostel Warden" : ""},</p>
+          <p style={{ margin: 0, color: "#64748b" }}>{formData.department || ""}</p>
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ margin: 0, fontWeight: 700 }}>Subject: {subject}</p>
+        </div>
+
+        <p style={{ margin: "8px 0 0" }}>Respected Sir/Madam,</p>
+        {body}
+        <p style={{ margin: "16px 0 0" }}>Thanking you,</p>
+        <p style={{ margin: "2px 0 0" }}>Yours sincerely,</p>
+        <p style={{ margin: "6px 0 0", fontWeight: 700 }}>{formData.name || "_______________"}</p>
+
+        {/* Details card */}
+        <div style={{ border: "1px solid #cbd5e1", borderRadius: 8, marginTop: 18 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {row("Student Name", formData.name)}
+              {row("Register Number", formData.registerNumber)}
+              {row("Department / Year / Sec", `${formData.department || ""} / ${formData.year || ""} / ${formData.section || ""}`)}
+              {isAbsent
+                ? row("Absent Date", absentDate)
+                : row("Leave Duration", dateRange)}
+              {!isAbsent && row("Leave Type", formData.leaveType)}
+              {isHosteller && row("Hostel Room No", formData.hostelRoomNo)}
+              {row("Parent / Guardian", formData.parentName)}
+              {row("Parent Mobile", formData.parentPhone)}
+              {row(isAbsent ? "Reason for Absence" : "Reason", formData.reason)}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Signatures */}
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${isHosteller ? 4 : 3}, 1fr)`, gap: 12, marginTop: 40, fontSize: 11, textAlign: "center" }}>
+          {["Student Signature", "Class Coordinator", ...(isHosteller ? ["Hostel Warden"] : []), "HOD Approval"].map((s) => (
+            <div key={s}>
+              <div style={{ borderTop: "1px solid #94a3b8", marginBottom: 6, marginTop: 30 }} />
+              <p style={{ margin: 0, fontWeight: 600, color: "#334155" }}>{s}</p>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ marginTop: 24, paddingTop: 10, borderTop: "1px solid #e2e8f0", textAlign: "center", fontSize: 10, color: "#94a3b8" }}>
+          Generated via Campus Flow – Smart Campus OD &amp; Leave Management System
+        </p>
+      </div>
+    );
+  };
+
   const renderDefaultPreview = () => (
     <div ref={formRef} style={{ width: 794, fontFamily: "serif", fontSize: 13, background: "#fff", color: "#000", padding: 40 }}>
       <div style={{ textAlign: "center", marginBottom: 16 }}>
