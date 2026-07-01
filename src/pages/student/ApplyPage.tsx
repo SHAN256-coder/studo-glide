@@ -156,15 +156,44 @@ const ApplyPage = () => {
     return true;
   };
 
+  const captureCanvas = async () => {
+    if (!formRef.current) return null;
+    // Force the capture to use the fixed 794px A4 width so scaled mobile
+    // previews still export at the correct aspect ratio.
+    return await html2canvas(formRef.current, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      width: 794,
+      windowWidth: 794,
+    });
+  };
+
   const handleSavePDF = async () => {
     if (!guardOrToast()) return;
-    if (!formRef.current) return;
     try {
-      const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+      const canvas = await captureCanvas();
+      if (!canvas) return;
       const pdf = new jsPDF("p", "mm", "a4");
-      const w = pdf.internal.pageSize.getWidth();
-      const h = (canvas.height * w) / canvas.width;
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, w, h);
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgH = (canvas.height * pageW) / canvas.width;
+      const img = canvas.toDataURL("image/png");
+      if (imgH <= pageH) {
+        pdf.addImage(img, "PNG", 0, 0, pageW, imgH);
+      } else {
+        // Multi-page: paginate the tall canvas across A4 pages
+        let heightLeft = imgH;
+        let position = 0;
+        pdf.addImage(img, "PNG", 0, position, pageW, imgH);
+        heightLeft -= pageH;
+        while (heightLeft > 0) {
+          position -= pageH;
+          pdf.addPage();
+          pdf.addImage(img, "PNG", 0, position, pageW, imgH);
+          heightLeft -= pageH;
+        }
+      }
       pdf.save(`${selectedForm}_${formData.registerNumber || "form"}.pdf`);
       toast.success("PDF downloaded!");
     } catch {
@@ -174,9 +203,9 @@ const ApplyPage = () => {
 
   const handleSaveJPG = async () => {
     if (!guardOrToast()) return;
-    if (!formRef.current) return;
     try {
-      const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+      const canvas = await captureCanvas();
+      if (!canvas) return;
       const link = document.createElement("a");
       link.download = `${selectedForm}_${formData.registerNumber || "form"}.jpg`;
       link.href = canvas.toDataURL("image/jpeg", 0.95);
