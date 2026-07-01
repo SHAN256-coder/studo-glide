@@ -72,8 +72,12 @@ const formTitleMap: Record<FormType, string> = {
 
 const ApplyPage = () => {
   const { user } = useAuth();
-  const { addApplication } = useAppContext();
+  const { addApplication, getStudentApplications } = useAppContext();
   const formRef = useRef<HTMLDivElement>(null);
+  const myApps = getStudentApplications(user?.id || "");
+  const siphCount = myApps.filter((a) => a.type === "siph-od").length;
+  const siphApproved = myApps.filter((a) => a.type === "siph-od" && a.status === "approved").length;
+  const siphPending = myApps.filter((a) => a.type === "siph-od" && a.status === "pending").length;
   const [selectedForm, setSelectedForm] = useState<FormType | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
