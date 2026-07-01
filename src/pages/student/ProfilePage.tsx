@@ -342,19 +342,63 @@ const ProfilePage = () => {
         </p>
       </motion.div>
 
-      {/* Export last 10 gate scans (CSV only) */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.318 }} className="glass-card p-4 sm:p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <FileText size={20} className="text-primary" />
-          <div className="flex-1">
-            <h3 className="text-base font-semibold text-card-foreground">Export Last 10 Gate Scans</h3>
-            <p className="text-xs text-muted-foreground">Download your most recent gate entry/exit records as CSV</p>
-          </div>
-        </div>
-        <Button onClick={handleExportScansCSV} disabled={exportingScans} variant="outline" className="w-full gap-2">
-          <FileSpreadsheet size={16} /> Download CSV
-        </Button>
-      </motion.div>
+      {/* Usage Analytics */}
+      {(() => {
+        const now = new Date();
+        const thisMonth = apps.filter((a) => {
+          const d = new Date((a as any).createdAt || (a as any).created_at || Date.now());
+          return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+        });
+        const byType = (t: string) => apps.filter((a) => a.type === t).length;
+        const stats = [
+          { label: "This Month", value: thisMonth.length, color: "text-primary" },
+          { label: "Approved", value: apps.filter((a) => a.status === "approved").length, color: "text-success" },
+          { label: "Pending", value: apps.filter((a) => a.status === "pending").length, color: "text-warning" },
+          { label: "Rejected", value: apps.filter((a) => a.status === "rejected").length, color: "text-destructive" },
+        ];
+        const breakdown = [
+          { label: "OD – Hosteller", value: byType("hostel-od") },
+          { label: "OD – Day Scholar", value: byType("day-scholar-od") },
+          { label: "SIPH OD", value: byType("siph-od") },
+          { label: "Leave / Absent", value: byType("leave") },
+        ];
+        const approvalRate = apps.length
+          ? Math.round((apps.filter((a) => a.status === "approved").length / apps.length) * 100)
+          : 0;
+        return (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.318 }} className="glass-card p-4 sm:p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Award size={18} className="text-primary" />
+              <h3 className="text-base font-semibold text-card-foreground">Usage Analytics</h3>
+            </div>
+            <div className="grid grid-cols-4 gap-2 text-center">
+              {stats.map((s) => (
+                <div key={s.label} className="p-2 rounded-lg bg-secondary/40">
+                  <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-[10px] text-muted-foreground">{s.label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Approval Rate</span>
+                <span className="font-semibold text-card-foreground">{approvalRate}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                <div className="h-full bg-primary transition-all" style={{ width: `${approvalRate}%` }} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {breakdown.map((b) => (
+                <div key={b.label} className="flex items-center justify-between text-xs bg-secondary/30 rounded-md px-2 py-1.5">
+                  <span className="text-muted-foreground truncate">{b.label}</span>
+                  <span className="font-semibold text-primary">{b.value}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        );
+      })()}
 
 
       {/* Monthly Excel Report */}
