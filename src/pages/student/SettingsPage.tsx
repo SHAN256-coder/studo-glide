@@ -80,7 +80,7 @@ const SettingsPage = () => {
             className={`p-3 rounded-lg border-2 transition-all ${theme === "light" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
           >
             <Sun size={20} className="mx-auto mb-1" />
-            <p className="text-xs font-semibold">Light · Ink Blue</p>
+            <p className="text-xs font-semibold">Light</p>
           </button>
           <button
             onClick={() => theme !== "dark" && toggleTheme()}
