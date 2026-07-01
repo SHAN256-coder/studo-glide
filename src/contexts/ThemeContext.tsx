@@ -118,10 +118,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const reset = () => {
       ["--primary","--ring","--accent","--background","--card","--card-foreground"].forEach(v => root.style.removeProperty(v));
     };
-    if (theme === "light") { reset(); }
-    else if (themePreset === "custom") { apply(customPrimary); }
-    else if (themePreset === "default") { reset(); }
-    else { const p = THEME_PRESETS[themePreset]; apply(p.primary, p.background, p.card, p.foreground); }
+    // Colour presets apply in BOTH light and dark modes.
+    // In light mode we only override the primary/ring/accent so the light
+    // surface (background/card/foreground) stays clean and readable.
+    if (themePreset === "default") { reset(); }
+    else if (themePreset === "custom") {
+      root.style.setProperty("--primary", customPrimary);
+      root.style.setProperty("--ring", customPrimary);
+      root.style.setProperty("--accent", customPrimary);
+      if (theme === "dark") { /* keep default dark surfaces */ }
+    }
+    else {
+      const p = THEME_PRESETS[themePreset];
+      if (theme === "light") {
+        root.style.setProperty("--primary", p.primary);
+        root.style.setProperty("--ring", p.primary);
+        root.style.setProperty("--accent", p.primary);
+      } else {
+        apply(p.primary, p.background, p.card, p.foreground);
+      }
+    }
     localStorage.setItem("theme-preset", themePreset);
     localStorage.setItem("theme-custom-primary", customPrimary);
   }, [themePreset, customPrimary, theme]);
