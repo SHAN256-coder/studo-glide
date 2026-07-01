@@ -476,9 +476,23 @@ const ApplyPage = () => {
           I assure you that I will be diligent in completing any academic requirements or classes missed during this period.
         </p>
         <p style={{ marginTop: 25 }}>Thanking you,</p>
+        <p style={{ margin: "2px 0 0" }}>Yours sincerely,</p>
+        <p style={{ margin: "6px 0 0", fontWeight: "bold" }}>{formData.name || "_______________"}</p>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 60, fontSize: 12 }}>
+
+      {/* Application Status / Usage snapshot */}
+      <div style={{ marginTop: 30, border: "1px dashed #c8a200", padding: "10px 14px", background: "#fffbea", fontSize: 12 }}>
+        <p style={{ margin: 0, fontWeight: "bold", color: "#7a5900" }}>SIPH OD – Application Status Snapshot</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 6 }}>
+          <p style={{ margin: 0 }}>Total SIPH ODs submitted: <strong>{siphCount}</strong></p>
+          <p style={{ margin: 0, color: "#166534" }}>Approved: <strong>{siphApproved}</strong></p>
+          <p style={{ margin: 0, color: "#92400e" }}>Pending: <strong>{siphPending}</strong></p>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 40, fontSize: 12 }}>
         <div><div style={{ borderTop: "1px solid #000", width: 180, marginBottom: 4 }} /><p style={{ fontWeight: "bold", letterSpacing: 2 }}>STUDENT SIGNATURE</p></div>
+        <div><div style={{ borderTop: "1px solid #000", width: 180, marginBottom: 4 }} /><p style={{ fontWeight: "bold", letterSpacing: 2 }}>SIPH HEAD</p></div>
         <div><div style={{ borderTop: "1px solid #000", width: 180, marginBottom: 4 }} /><p style={{ fontWeight: "bold", letterSpacing: 2 }}>HOD APPROVAL</p></div>
       </div>
     </div>
