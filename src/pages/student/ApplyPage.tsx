@@ -1036,6 +1036,8 @@ const ApplyPage = () => {
             {selectedForm === "leave-hosteller" ? renderHostelLeavePreview() :
              selectedForm === "siph-od" ? renderSiphODPreview() :
              isODForm ? renderODLetterPreview() :
+             (selectedForm === "leave-dayscholar" || selectedForm === "absent-hosteller" || selectedForm === "absent-dayscholar")
+               ? renderFormalLetterPreview() :
              renderDefaultPreview()}
           </A4PreviewWrapper>
         </motion.div>
