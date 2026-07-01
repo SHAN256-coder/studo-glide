@@ -587,16 +587,11 @@ const ApplyPage = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between gap-2 flex-wrap">
-        <div>
-          <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Apply</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Select a form, fill details (<span className="text-destructive">*</span> required), and download
-          </p>
-        </div>
-        <Button size="sm" variant="outline" onClick={() => setShowFeedback((s) => !s)} className="gap-1.5">
-          <AlertTriangle size={14} /> Report Issue
-        </Button>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-lg sm:text-xl font-display font-bold gold-gradient-text">Apply</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          Select a form, fill details (<span className="text-destructive">*</span> required), and download
+        </p>
       </motion.div>
 
       {showFeedback && <FeedbackForm onClose={() => setShowFeedback(false)} />}
