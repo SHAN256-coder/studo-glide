@@ -162,15 +162,36 @@ const ApplyPage = () => {
 
   const captureCanvas = async () => {
     if (!formRef.current) return null;
-    // Force the capture to use the fixed 794px A4 width so scaled mobile
-    // previews still export at the correct aspect ratio.
-    return await html2canvas(formRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-      width: 794,
-      windowWidth: 794,
-    });
+    // The on-screen preview sits inside a CSS `transform: scale(...)` wrapper
+    // (A4PreviewWrapper) so it fits mobile screens. html2canvas mis-measures
+    // text positions inside transformed ancestors and stacks glyphs on top
+    // of each other. To get a clean A4 render we clone the node into a fresh
+    // off-screen container with NO transform and capture that instead.
+    const source = formRef.current;
+    const clone = source.cloneNode(true) as HTMLElement;
+    const holder = document.createElement("div");
+    holder.style.cssText =
+      "position:fixed;left:-10000px;top:0;width:794px;background:#ffffff;z-index:-1;";
+    clone.style.transform = "none";
+    clone.style.width = "794px";
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+    // Allow layout + web fonts to settle before snapshot
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    if ((document as any).fonts?.ready) {
+      try { await (document as any).fonts.ready; } catch { /* ignore */ }
+    }
+    try {
+      return await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        width: 794,
+        windowWidth: 794,
+      });
+    } finally {
+      document.body.removeChild(holder);
+    }
   };
 
   const handleSavePDF = async () => {
