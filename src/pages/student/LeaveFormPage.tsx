@@ -41,10 +41,29 @@ const LeaveFormPage = () => {
     return 0;
   };
 
-  const handleSavePDF = async () => {
-    if (!formRef.current) return;
+  const captureCanvas = async () => {
+    if (!formRef.current) return null;
+    const source = formRef.current;
+    const clone = source.cloneNode(true) as HTMLElement;
+    const holder = document.createElement("div");
+    holder.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;background:#ffffff;z-index:-1;";
+    clone.style.transform = "none";
+    clone.style.width = "794px";
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    if ((document as any).fonts?.ready) { try { await (document as any).fonts.ready; } catch {} }
     try {
-      const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+      return await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: "#ffffff", width: 794, windowWidth: 794 });
+    } finally {
+      document.body.removeChild(holder);
+    }
+  };
+
+  const handleSavePDF = async () => {
+    try {
+      const canvas = await captureCanvas();
+      if (!canvas) return;
       const pdf = new jsPDF("p", "mm", "a4");
       const w = pdf.internal.pageSize.getWidth();
       const h = (canvas.height * w) / canvas.width;
@@ -55,9 +74,9 @@ const LeaveFormPage = () => {
   };
 
   const handleSaveJPG = async () => {
-    if (!formRef.current) return;
     try {
-      const canvas = await html2canvas(formRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+      const canvas = await captureCanvas();
+      if (!canvas) return;
       const link = document.createElement("a");
       link.download = `Leave_Form_${formData.registerNumber}.jpg`;
       link.href = canvas.toDataURL("image/jpeg", 0.95);
