@@ -2,9 +2,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext, ApplicationStatus } from "@/contexts/AppContext";
-import { FileText, Clock, CheckCircle, XCircle, CalendarDays, AlertTriangle, Zap, Calendar as CalendarIcon2, CreditCard } from "lucide-react";
+import { FileText, Clock, CheckCircle, XCircle, CalendarDays, AlertTriangle, Zap, Calendar as CalendarIcon2, CreditCard, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StudentIDCard from "@/components/StudentIDCard";
+import { QRCodeSVG } from "qrcode.react";
+import { buildGateCode } from "@/lib/gateCode";
+
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string; icon: typeof Clock }> = {
   pending: { label: "Pending", className: "status-pending", icon: Clock },
@@ -83,6 +86,51 @@ const StudentDashboard = () => {
           </motion.div>
         ))}
       </div>
+
+      {/* Profile QR — quick identity card */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="glass-card-hover p-4 sm:p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <QrCode className="text-primary" size={18} />
+          <h3 className="text-sm sm:text-base font-semibold text-card-foreground">My Profile QR</h3>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="bg-white p-3 rounded-lg shadow-md flex-shrink-0">
+            <QRCodeSVG
+              value={buildGateCode({
+                id: user?.id,
+                registerNumber: user?.registerNumber,
+                name: user?.name,
+                department: user?.department,
+                section: user?.section,
+              })}
+              size={130}
+            />
+          </div>
+          <div className="flex-1 w-full space-y-1.5 text-center sm:text-left">
+            <p className="text-base sm:text-lg font-bold text-card-foreground uppercase tracking-wide">
+              {user?.name || "—"}
+            </p>
+            <p className="text-xs sm:text-sm font-mono font-semibold text-primary uppercase">
+              {user?.registerNumber || "—"}
+            </p>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] sm:text-xs text-muted-foreground pt-1">
+              <div><span className="font-medium text-card-foreground">Dept:</span> {user?.department || "—"}</div>
+              <div><span className="font-medium text-card-foreground">Section:</span> {user?.section || "—"}</div>
+              <div><span className="font-medium text-card-foreground">Year:</span> {user?.year || "—"}</div>
+              <div><span className="font-medium text-card-foreground">Sem:</span> {user?.semester || "—"}</div>
+            </div>
+            <p className="text-[10px] text-muted-foreground pt-1 italic">
+              Scan to verify identity
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
         <h3 className="text-base sm:text-lg font-semibold text-card-foreground mb-3">Recent Applications</h3>
         <div className="space-y-2 sm:space-y-3">
