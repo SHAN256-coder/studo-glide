@@ -2,9 +2,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppContext, ApplicationStatus } from "@/contexts/AppContext";
-import { FileText, Clock, CheckCircle, XCircle, CalendarDays, AlertTriangle, Zap, Calendar as CalendarIcon2, CreditCard } from "lucide-react";
+import { FileText, Clock, CheckCircle, XCircle, CalendarDays, AlertTriangle, Zap, Calendar as CalendarIcon2, CreditCard, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StudentIDCard from "@/components/StudentIDCard";
+import { QRCodeSVG } from "qrcode.react";
+import { buildGateCode } from "@/lib/gateCode";
+
 
 const statusConfig: Record<ApplicationStatus, { label: string; className: string; icon: typeof Clock }> = {
   pending: { label: "Pending", className: "status-pending", icon: Clock },
